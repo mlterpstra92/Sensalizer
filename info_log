@@ -11,6 +11,9 @@ Chef deployed naar AWS.
 
 Feeds naar AWS database.
 
+Waarom DynamoDB?
+	Key/value store. Wij hebben keys en values dus logische keuze. Bovendien goede integratie met Elastic MapReduce en andere AWS services.
+
 TODO Tegenstrijdige informatie in database....
 
 Zookeeper... op AWS
