@@ -19,3 +19,6 @@ TODO Tegenstrijdige informatie in database....
 Zookeeper... op AWS
   Synct mooi met Amazon EC2
   http://zookeeper-user.578899.n2.nabble.com/Best-practices-for-using-zookeeper-in-an-Amazon-EC2-environment-td7579179.html
+
+Voor verkrijgen sensor data:
+	EventSource/long polling
