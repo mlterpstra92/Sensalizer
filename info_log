@@ -3,18 +3,27 @@
 
 AWS amazon server.
 
-Scala builder -> scala spt.
+Scala builder -> scala sbt.
 
-Chef deployed naar AWS.
+Chef deploys naar AWS.
 	http://www.getchef.com/solutions/aws/
 	AKA sjef
+
+Eerste stap: Example sensor data (sinus) van Xively readen als Feed 
+Tweede stap: Location data from smartphone writen naar Xively
 
 Feeds naar AWS database.
 
 Waarom DynamoDB?
 	Key/value store. Wij hebben keys en values dus logische keuze. Bovendien goede integratie met Elastic MapReduce en andere AWS services.
 
-TODO Tegenstrijdige informatie in database....
+TODO 	Tegenstrijdige informatie in database....
+	Waarom Scala, sbt
+	Waarom Chef
+	Waarom AWS
+	Waarom Zookeeper
+	Waarom EventSource
+(hoeft allemaal niet uitgebreid, maar vroeg of laat zullen we keuzen uit moeten kunnen leggen. Kunnen we het beter nu gelijk maar bijhouden, lijkt me)
 
 Zookeeper... op AWS
   Synct mooi met Amazon EC2
