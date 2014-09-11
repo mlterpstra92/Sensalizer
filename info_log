@@ -31,3 +31,6 @@ Zookeeper... op AWS
 
 Voor verkrijgen sensor data:
 	EventSource/long polling
+
+Spark in EMR:
+https://aws.amazon.com/articles/Elastic-MapReduce/4926593393724923
