@@ -1,0 +1,81 @@
+@(title: String, user: String)
+@main(title, user) {
+    <div class="container">
+        <div class="row clearfix">
+            <div class="col-md-12 column">
+                <div class="jumbotron">
+
+                    <a href="@routes.Application.index()">Go back your feeds...</a>
+                    <h1>
+                        Hello, @user!
+                    </h1>
+                    <p>
+                        Here you can manage your profile.
+                    </p>
+                    <table class="table table-striped table-hover">
+                        <thead>
+                            <tr>
+                                <th>
+                                    Product
+                                </th>
+                                <th>
+                                    Payment Taken
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>
+                                    API key
+                                </td>
+                                <td>
+                                    lkajsdhflkasdfhkajsdfh
+                                </td>
+                                <td>
+                                    <a class="btn btn-default btn-large" href="#">Change API key</a>
+                                </td>
+                            </tr>
+                            <tr class="active">
+                                <td>
+                                    1
+                                </td>
+                                <td>
+                                    TB - Monthly
+                                </td>
+                            </tr>
+                            <tr class="success">
+                                <td>
+                                    2
+                                </td>
+                                <td>
+                                    TB - Monthly
+                                </td>
+                            </tr>
+                            <tr class="warning">
+                                <td>
+                                    3
+                                </td>
+                                <td>
+                                    TB - Monthly
+                                </td>
+                            </tr>
+                            <tr class="danger">
+                                <td>
+                                    4
+                                </td>
+                                <td>
+                                    TB - Monthly
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+
+                    <p>
+                        <a class="btn btn-danger btn-large" href="#">Delete my account</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+}
