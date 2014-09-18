@@ -1,5 +1,5 @@
-@(title: String, user: String)
-@main(title, user) {
+@(title: String)
+@main(title) {
     <div class="container">
         <div class="row clearfix">
             <div class="col-md-12 column">
@@ -7,24 +7,14 @@
 
                     <a href="@routes.Application.index()">Go back your feeds...</a>
                     <h1>
-                        Hello, @user!
+                        Hello, Maarten!
                     </h1>
                     <p>
                         Here you can manage your profile.
                     </p>
-                    <table class="table table-striped table-hover">
-                        <thead>
-                            <tr>
-                                <th>
-                                    Product
-                                </th>
-                                <th>
-                                    Payment Taken
-                                </th>
-                            </tr>
-                        </thead>
+                    <table class="table table-bordered table-hover">
                         <tbody>
-                            <tr>
+                            <tr class="active">
                                 <td>
                                     API key
                                 </td>
@@ -32,39 +22,7 @@
                                     lkajsdhflkasdfhkajsdfh
                                 </td>
                                 <td>
-                                    <a class="btn btn-default btn-large" href="#">Change API key</a>
-                                </td>
-                            </tr>
-                            <tr class="active">
-                                <td>
-                                    1
-                                </td>
-                                <td>
-                                    TB - Monthly
-                                </td>
-                            </tr>
-                            <tr class="success">
-                                <td>
-                                    2
-                                </td>
-                                <td>
-                                    TB - Monthly
-                                </td>
-                            </tr>
-                            <tr class="warning">
-                                <td>
-                                    3
-                                </td>
-                                <td>
-                                    TB - Monthly
-                                </td>
-                            </tr>
-                            <tr class="danger">
-                                <td>
-                                    4
-                                </td>
-                                <td>
-                                    TB - Monthly
+                                    <a class="btn btn-primary btn-large" href="#">Change API key</a>
                                 </td>
                             </tr>
                         </tbody>
@@ -72,6 +30,7 @@
 
 
                     <p>
+                        <a class="btn btn-primary btn-large" href="#">Change password</a>
                         <a class="btn btn-danger btn-large" href="#">Delete my account</a>
                     </p>
                 </div>
