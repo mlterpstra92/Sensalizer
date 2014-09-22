@@ -6,6 +6,6 @@ package models
 case class Authorization(userID: Long)
 object Authorization {
   def isAuthorized(userID: Long) : Boolean = {
-    return true
+    true
   }
 }

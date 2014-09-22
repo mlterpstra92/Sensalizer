@@ -6,13 +6,13 @@ package models
 case class Login(userID: Long)
 object Login {
   def loggedIn(userID: Long): Boolean = {
-    return true
+    true
   }
 
   def getLoggedInUser(userID: Long): String = {
     if (userID == 0) {
-      return "Maarten"
+      "Maarten"
     }
-    else return null
+    else null
   }
 }

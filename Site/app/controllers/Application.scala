@@ -1,6 +1,6 @@
 package controllers
 
-import models.Feed
+import models.Feeds
 import models.Authorization
 import models.Login
 import play.api._
@@ -16,22 +16,26 @@ object Application extends Controller {
   }
 
 
-  def profile(userID: Long) = Action {
+  def profile(userID: Int) = Action {
     if (models.Authorization.isAuthorized(userID))
       Ok(views.html.profile(userID))
     else
       Unauthorized(views.html.unauthorized())
   }
 
-  def feed(feedID: Long) = Action{
+  def feed(feedID: Int) = Action {
     if (models.Authorization.isAuthorized(0))
-      Ok(views.html.feed(feedID))
+        if (feedID > 0 && models.Feeds.getList.exists(f => f.feedID == feedID))
+            Ok(views.html.feed(feedID))
+        else
+            NotFound(views.html.notfound())
     else
       Unauthorized(views.html.unauthorized())
   }
+
   def feeds = Action{
     if (models.Authorization.isAuthorized(0))
-      Ok(views.html.feeds(Feed.getList))
+      Ok(views.html.feeds(Feeds.getList))
     else
       Unauthorized(views.html.unauthorized())
   }
