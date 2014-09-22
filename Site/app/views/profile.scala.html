@@ -1,5 +1,5 @@
-@(title: String)
-@main(title) {
+@(userID: Long)
+@main("Profile") {
     <div class="container">
         <div class="row clearfix">
             <div class="col-md-12 column">
@@ -7,7 +7,7 @@
 
                     <a href="@routes.Application.index()">Go back your feeds...</a>
                     <h1>
-                        Hello, Maarten!
+                        Hello, @models.Login.getLoggedInUser(userID)!
                     </h1>
                     <p>
                         Here you can manage your profile.

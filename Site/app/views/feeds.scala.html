@@ -1,11 +1,9 @@
 @(feeds: List[Feed])
-@main("afd") {
+@main("Feeds") {
     <div class="container">
         <div class="row clearfix">
-            <div class="col-md-12 column">
+            <div class="col-md-6 column">
                 <div class="jumbotron">
-
-                    <a href="@routes.Application.index()">Go back your feeds...</a>
                     <table class="table table-bordered table-hover">
                         <tbody>
                             @if(feeds.length == 0) {
@@ -14,10 +12,13 @@
                                 @for(f <- feeds) {
                                     <tr class="active">
                                         <td>
-                                        @f.id
+                                            @f.feedID
                                         </td>
                                         <td>
-                                            <a class="btn btn-primary btn-large" href="@routes.Application.feed(f.id)">View feed</a>
+                                            @f.title
+                                        </td>
+                                        <td>
+                                            <a class="btn btn-primary btn-large" href="@routes.Application.feed(f.feedID)">View feed</a>
                                         </td>
                                     </tr>
                                 }

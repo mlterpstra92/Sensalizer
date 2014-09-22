@@ -9,8 +9,8 @@ GET        /                    controllers.Application.index
 GET        /assets/*file        controllers.Assets.at(path="/public", file)
 
 # View your profile
-GET        /profile             controllers.Application.profile(title)
+GET        /profile/:userID     controllers.Application.profile(userID: Long)
 GET        /feeds               controllers.Application.feeds
-GET        /feed/:id             controllers.Application.feed(id: Long)
+GET        /feed/:feedID            controllers.Application.feed(feedID: Long)
 
     
