@@ -34,11 +34,11 @@
                 //If a feed management is called, perform those actions
                 //That is, load the feed the user clicks on using AJAX
                 if (e.currentTarget.id == "selectFeed"){
-                    console.log(e);
                                  //this     td       tr        first td      its data without spaces
                     var feedID = $(this).parent().parent().find('td')[0].innerHTML.trim();
                     $.get("feed/"+feedID, function(data){
-                        $("#feedView").html(data);
+                        $("#feedView").stop().css('opacity', '0').html(data).animate({opacity: 1},1000);
+                        //$("#feedView").html(data);
                     });
                 }
             });
