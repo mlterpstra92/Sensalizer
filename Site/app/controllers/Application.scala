@@ -24,10 +24,15 @@ object Application extends Controller {
   }
 
   def feed(feedID: Long) = Action{
-    // TODO: make sure user can view feed
-    Ok(views.html.feed(feedID))
+    if (models.Authorization.isAuthorized(0))
+      Ok(views.html.feed(feedID))
+    else
+      Unauthorized(views.html.unauthorized())
   }
   def feeds = Action{
-    Ok(views.html.feeds(Feed.getList))
+    if (models.Authorization.isAuthorized(0))
+      Ok(views.html.feeds(Feed.getList))
+    else
+      Unauthorized(views.html.unauthorized())
   }
 }

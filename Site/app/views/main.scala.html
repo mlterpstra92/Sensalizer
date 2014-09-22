@@ -1,4 +1,5 @@
 @(title: String)(content: Html)
+@import models.Login
 <!DOCTYPE html>
 <html>
     <head>
@@ -18,7 +19,9 @@
         <link rel="stylesheet" media="screen" href="@routes.Assets.at("stylesheets/bootstrap-dialog.min.css")">
         <script src="@routes.Assets.at("javascripts/bootstrap-dialog.min.js")" type="text/javascript"></script>
         <link rel="shortcut icon" type="image/png" href="@routes.Assets.at("images/favicon.png")">
-
+        @if(models.Login.loggedIn(0) == false) {
+            <link rel="stylesheet" media="screen" href="@routes.Assets.at("stylesheets/landing-page.css")">
+        }
         <script>
             $(document ).ready(function(){
                 $("#feedManagement" ).click(function(e){
