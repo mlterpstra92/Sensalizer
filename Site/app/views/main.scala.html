@@ -18,6 +18,24 @@
             <!-- Latest compiled and minified JavaScript -->
         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
 
+        <script src="//cdnjs.cloudflare.com/ajax/libs/Chart.js/0.2.0/Chart.min.js"></script>
+
+        <style type="text/css">
+            #canvasContainer {
+                position: relative;
+            }
+
+            #feedGraph{
+                display: block;
+                position: relative;
+                margin: auto;
+                max-width: 70vw;
+                max-height: 70vh;
+                border: 1px solid black;
+            }
+
+        </style>
+
         <link rel="stylesheet" media="screen" href="@routes.Assets.at("stylesheets/main.css")">
         <link rel="stylesheet" media="screen" href="@routes.Assets.at("stylesheets/style.css")">
         <link rel="stylesheet" media="screen" href="@routes.Assets.at("stylesheets/bootstrap-dialog.min.css")">
@@ -27,8 +45,57 @@
             <link rel="stylesheet" media="screen" href="@routes.Assets.at("stylesheets/landing-page.css")">
         }
         <script>
-        $(document).ready(function() {
-            //Apparently, we eat click events, so use event delegation
+
+        $(document ).ready(function(){
+            function resize() {
+
+                var canvas = document.getElementById('feedGraph');
+                var canvasRatio = canvas.height / canvas.width;
+                var windowRatio = window.innerHeight / window.innerWidth;
+                var width;
+                var height;
+
+                if (windowRatio < canvasRatio) {
+                    height = window.innerHeight;
+                    width = height / canvasRatio;
+                } else {
+                    width = window.innerWidth;
+                    height = width * canvasRatio;
+                }
+
+                canvas.style.width = width + 'px';
+                canvas.style.height = height + 'px';
+            };
+
+            window.addEventListener('resize', resize, false);
+            var data = {
+                labels: ["January", "February", "March", "April", "May", "June", "July"],
+                datasets:
+                [
+                    {
+                        label: "My First dataset",
+                        fillColor: "rgba(220,220,220,0.2)",
+                        strokeColor: "rgba(220,220,220,1)",
+                        pointColor: "rgba(220,220,220,1)",
+                        pointStrokeColor: "#fff",
+                        pointHighlightFill: "#fff",
+                        pointHighlightStroke: "rgba(220,220,220,1)",
+                        data: [65, 59, 80, 81, 56, 55, 40]
+                    },
+                    {
+                    label: "My Second dataset",
+                    fillColor: "rgba(151,187,205,0.2)",
+                    strokeColor: "rgba(151,187,205,1)",
+                    pointColor: "rgba(151,187,205,1)",
+                    pointStrokeColor: "#fff",
+                    pointHighlightFill: "#fff",
+                    pointHighlightStroke: "rgba(151,187,205,1)",
+                    data: [28, 48, 40, 19, 86, 27, 90]
+                    }
+                ]
+            };
+
+        //Apparently, we eat click events, so use event delegation
             $(this ).on('click', 'button', function(e){
                 e.preventDefault();
                 //If a feed management is called, perform those actions
@@ -36,13 +103,19 @@
                 if (e.currentTarget.id == "selectFeed"){
                                  //this     td       tr        first td      its data without spaces
                     var feedID = $(this).parent().parent().find('td')[0].innerHTML.trim();
-                    $.get("feed/"+feedID, function(data){
-                        $("#feedView").stop().css('opacity', '0').html(data).animate({opacity: 1},1000);
-                        //$("#feedView").html(data);
+                    $.get("feed/"+feedID, function(returnData){
+                        //$("#feedView").stop().css('opacity', '0').html(data).animate({opacity: 1},1000);
+                        this.data = returnData;
+                        resize();
                     });
                 }
             });
+            var ctx = $("#feedGraph").get(0).getContext("2d");
+            ctx.canvas.width=window.innerWidth;
+            ctx.canvas.height=window.innerHeight;
+            var myNewChart = new Chart(ctx ).Line(data);
         });
+
         </script>
     </head>
     <body>
