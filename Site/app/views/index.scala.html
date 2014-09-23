@@ -69,10 +69,19 @@
                     </div>
 
                 </nav>
-                <div class="jumbotron" id="feedView" style="text-align: center;">
-                    <div id="canvasContainer">
-                        <canvas id="feedGraph"></canvas>
+                <!--<div class="jumbotron" id="feedView">
+                    <div class="container-canvas">
+                        <canvas id="feedGraph" width="800px" height="480px"></canvas>
                     </div>
+                </div>-->
+                <div class="jumbotron">
+                    <div class="row">
+                        <div id="canvasContainer" class="col-md-12">
+                            <canvas id="feedGraph" width="300" height="300">
+                                Sorry, your browser doesn't support the &lt;canvas&gt; element.
+                            </canvas>
+                        </div>
+                    </div> <!-- /row -->
                 </div>
             </div>
         </div>

@@ -16,7 +16,7 @@ object Feeds {
   var feeds : ArrayBuffer[Feed] = ArrayBuffer()
   def getList: List[Feed] = {
 
-    feeds += Feed(1, "hurrdurr", ArrayBuffer("This: that").toList)
+    feeds += Feed(1, "Test feed", ArrayBuffer("This: that").toList)
     feeds.distinct
     feeds.toList
   }

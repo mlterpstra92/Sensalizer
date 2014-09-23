@@ -20,22 +20,6 @@
 
         <script src="//cdnjs.cloudflare.com/ajax/libs/Chart.js/0.2.0/Chart.min.js"></script>
 
-        <style type="text/css">
-            #canvasContainer {
-                position: relative;
-            }
-
-            #feedGraph{
-                display: block;
-                position: relative;
-                margin: auto;
-                max-width: 70vw;
-                max-height: 70vh;
-                border: 1px solid black;
-            }
-
-        </style>
-
         <link rel="stylesheet" media="screen" href="@routes.Assets.at("stylesheets/main.css")">
         <link rel="stylesheet" media="screen" href="@routes.Assets.at("stylesheets/style.css")">
         <link rel="stylesheet" media="screen" href="@routes.Assets.at("stylesheets/bootstrap-dialog.min.css")">
@@ -44,30 +28,14 @@
         @if(!models.Login.loggedIn(0)) {
             <link rel="stylesheet" media="screen" href="@routes.Assets.at("stylesheets/landing-page.css")">
         }
+        <style type="text/css">
+            canvas {
+                position: relative;
+            }
+        </style>
         <script>
 
         $(document ).ready(function(){
-            function resize() {
-
-                var canvas = document.getElementById('feedGraph');
-                var canvasRatio = canvas.height / canvas.width;
-                var windowRatio = window.innerHeight / window.innerWidth;
-                var width;
-                var height;
-
-                if (windowRatio < canvasRatio) {
-                    height = window.innerHeight;
-                    width = height / canvasRatio;
-                } else {
-                    width = window.innerWidth;
-                    height = width * canvasRatio;
-                }
-
-                canvas.style.width = width + 'px';
-                canvas.style.height = height + 'px';
-            };
-
-            window.addEventListener('resize', resize, false);
             var data = {
                 labels: ["January", "February", "March", "April", "May", "June", "July"],
                 datasets:
@@ -94,6 +62,27 @@
                     }
                 ]
             };
+        var ratio = $("#canvasContainer").height()/$("#canvasContainer").width();
+        //Get the context of the canvas element we want to select
+        var c = $('#feedGraph');
+        var ct = c.get(0).getContext('2d');
+        var ctx = document.getElementById("feedGraph").getContext("2d");
+        /*************************************************************************/
+        //Run function when window resizes
+        $(window).resize(respondCanvas);
+        var options = {
+            responsive: true
+        };
+
+        function respondCanvas() {
+            c.attr('width', $("#canvasContainer").width());
+            c.attr('height', $("#canvasContainer").width()*(ratio));
+            //Call a function to redraw other content (texts, images etc)
+            new Chart(ct).Line(data, options);
+        }
+
+        //Initial call
+        respondCanvas();
 
         //Apparently, we eat click events, so use event delegation
             $(this ).on('click', 'button', function(e){
@@ -103,17 +92,20 @@
                 if (e.currentTarget.id == "selectFeed"){
                                  //this     td       tr        first td      its data without spaces
                     var feedID = $(this).parent().parent().find('td')[0].innerHTML.trim();
-                    $.get("feed/"+feedID, function(returnData){
-                        //$("#feedView").stop().css('opacity', '0').html(data).animate({opacity: 1},1000);
-                        this.data = returnData;
-                        resize();
+                    $.ajax({
+                        url: "feed/"+feedID,
+                        method: 'GET',
+                        content: 'json',
+                        success: function (d) {
+                            new Chart(ct).Bar(d, options);
+                        },
+                        error: function (xhr, ajaxOptions, thrownError) {
+                            alert(xhr.status);
+                            alert(thrownError);
+                        }
                     });
                 }
             });
-            var ctx = $("#feedGraph").get(0).getContext("2d");
-            ctx.canvas.width=window.innerWidth;
-            ctx.canvas.height=window.innerHeight;
-            var myNewChart = new Chart(ctx ).Line(data);
         });
 
         </script>
