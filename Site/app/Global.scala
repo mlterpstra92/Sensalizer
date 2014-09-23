@@ -16,7 +16,7 @@ object Global extends GlobalSettings {
   }
 
   // 404 - page not found error
-  override def onHandlerNotFound(request: RequestHeader) = {
+  override def onHandlerNotFound(request: RequestHeader)= {
     Future.successful(NotFound(views.html.errors.onHandlerNotFound(request)))
   }
 

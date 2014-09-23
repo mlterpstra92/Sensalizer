@@ -28,7 +28,7 @@ object Application extends Controller {
         if (feedID > 0 && models.Feeds.getList.exists(f => f.feedID == feedID))
             Ok(views.html.feed(feedID))
         else
-            NotFound(views.html.notfound())
+            Unauthorized(views.html.unauthorized()) //This has to be not found or something similar
     else
       Unauthorized(views.html.unauthorized())
   }
