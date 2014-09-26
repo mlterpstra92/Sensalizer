@@ -6,6 +6,10 @@ import models.Login
 import play.api._
 import play.api.mvc._
 import play.api.libs.json._
+import com.datastax.driver.core.Row
+import com.websudos.phantom.sample.ExampleModel
+import com.websudos.phantom.Implicits._
+
 
 
 object Application extends Controller {

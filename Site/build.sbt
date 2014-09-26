@@ -6,4 +6,13 @@ version := "1.0"
 
 playScalaSettings
 
-libraryDependencies += "com.websudos"  %% "phantom-dsl" % "1.2.7"
+val phantomVersion = "1.2.2"
+
+libraryDependencies ++= Seq(
+  "com.websudos"  %% "phantom-dsl"                   % phantomVersion,
+  "com.websudos"  %% "phantom-example"               % phantomVersion,
+  "com.websudos"  %% "phantom-spark"                 % phantomVersion,
+  "com.websudos"  %% "phantom-test"                  % phantomVersion,
+  "com.websudos"  %% "phantom-testing"               % phantomVersion,
+  "com.websudos"  %% "phantom-udt"                   % phantomVersion
+)
