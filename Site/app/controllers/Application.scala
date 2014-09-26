@@ -1,16 +1,18 @@
 package controllers
 
+import java.util.UUID
+
 import models.Feeds
 import models.Authorization
 import models.Login
+import org.joda.time.DateTime
 import play.api._
 import play.api.mvc._
 import play.api.libs.json._
 import com.datastax.driver.core.Row
-import com.websudos.phantom.sample.ExampleModel
 import com.websudos.phantom.Implicits._
-
-
+import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
 
 object Application extends Controller {
 
