@@ -12,7 +12,5 @@ libraryDependencies ++= Seq(
   "com.websudos"  %% "phantom-dsl"                   % phantomVersion,
   "com.websudos"  %% "phantom-example"               % phantomVersion,
   "com.websudos"  %% "phantom-spark"                 % phantomVersion,
-  "com.websudos"  %% "phantom-test"                  % phantomVersion,
-  "com.websudos"  %% "phantom-testing"               % phantomVersion,
   "com.websudos"  %% "phantom-udt"                   % phantomVersion
 )
