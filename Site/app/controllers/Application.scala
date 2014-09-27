@@ -1,17 +1,23 @@
 package controllers
 
-import java.util.UUID
 
-import models.Feeds
-import models.Authorization
-import models.Login
+import models.{Feed, Feeds, Authorization, Login}
 import org.joda.time.DateTime
 import play.api._
 import play.api.mvc._
+import scala.concurrent._
+import scala.util.{Success, Failure}
 import play.api.libs.json._
 import com.datastax.driver.core.Row
 import com.websudos.phantom.Implicits._
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Await
+import scala.concurrent.duration._
+import com.datastax.driver.core.{ResultSet, Row}
+import com.websudos.phantom.CassandraTable
+import com.websudos.phantom.Implicits._
+import com.websudos.phantom.column.{SetColumn, DateTimeColumn}
+import com.websudos.phantom.iteratee.Iteratee
 import scala.concurrent.Future
 
 object Application extends Controller {
@@ -33,7 +39,9 @@ object Application extends Controller {
 
 
     def feed(feedID: Int) = Action {
-      if (models.Authorization.isAuthorized(0))
+      val f = models.Feeds.getFeedById(feedID)
+      Ok("Hallo")
+/*      if (models.Authorization.isAuthorized(0))
         if (feedID > 0 && models.Feeds.getList.exists(f => f.feedID == feedID)){
           val jsonObject = Json.toJson(
           Map(
@@ -59,12 +67,22 @@ object Application extends Controller {
         else
             Unauthorized(views.html.unauthorized()) //This has to be not found or something similar
       else
-        Unauthorized(views.html.unauthorized())
+        Unauthorized(views.html.unauthorized())*/
     }
 
-  def feeds = Action{
-    if (models.Authorization.isAuthorized(0))
-      Ok(views.html.feeds(Feeds.getList))
+  def feeds = Action {
+    //Create tables
+    //Await.result(models.Feeds.createTable, 5000 millis)
+    //Await.result(models.Datastreams.createTable, 5000 millis)
+    if (models.Authorization.isAuthorized(0)) {
+      val f = future {
+        Feeds.getList
+      }
+      f onSuccess {
+        case feedList: Seq[Feed] => Ok(views.html.feeds(feedList))
+      }
+      throw new Exception()
+    }
     else
       Unauthorized(views.html.unauthorized())
   }

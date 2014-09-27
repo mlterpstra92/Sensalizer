@@ -20,11 +20,11 @@ import com.websudos.phantom.Implicits._
 
 import scala.concurrent.{Future, blocking}
 
-object DBConnector {
-  val keySpace = "Sensalizer"
+object MyDBConnector {
+  val keySpace = "sensalizer"
 
   lazy val cluster =  Cluster.builder()
-    .addContactPoint("54.171.9.240")
+    .addContactPoint("54.171.42.212")
     .withPort(9042)
     .withoutJMXReporting()
     .withoutMetrics()
@@ -35,12 +35,12 @@ object DBConnector {
   }
 }
 
-trait DBConnector {
+trait MyDBConnector {
   self: CassandraTable[_, _] =>
 
   def createTable(): Future[Unit] ={
     create.future() map (_ => ())
   }
 
-  implicit lazy val datastax: Session = DBConnector.session
+  implicit lazy val datastax: Session = MyDBConnector.session
 }
