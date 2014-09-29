@@ -28,3 +28,10 @@ case class Feed(
                               datastreams: List[Int]
                               )
 object Feed{}
+
+case class Userstate(
+                       userID: Int,
+                       username: String,
+                       APIKey: String)
+
+object Userstate{}

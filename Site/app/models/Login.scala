@@ -9,7 +9,8 @@ object Login {
     true
   }
 
-  def getLoggedInUser(userID: Long): String = {
+  def getLoggedInUser(userID: Int): String = {
+    print(Userstates.getUserByUserID(userID))
     if (userID == 0) {
       "Maarten"
     }
