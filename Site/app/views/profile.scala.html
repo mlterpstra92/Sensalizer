@@ -6,7 +6,7 @@
 </div>
 <div class="modal-body">
     <h1>
-        Hello, @models.Login.getLoggedInUser(userID)!
+        Hello, @models.Login.getLoggedInUser(userID).username!
     </h1>
     <table class="table table-bordered table-hover">
         <tbody>
@@ -15,7 +15,7 @@
                     API key
                 </td>
                 <td>
-                    lkajsdhflkasdfhkajsdfh
+                    @models.Login.getLoggedInUser(userID).APIKey
                 </td>
                 <td>
                     <a class="btn btn-warning btn-large" href="#">Change API key</a>

@@ -20,7 +20,7 @@ abstract case class Datastreams extends CassandraTable[Datastreams, Datastream]{
 }
 object Datastreams extends Datastreams with MyDBConnector {
   // you can even rename the table in the schema to whatever you like.
-  override lazy val tableName = "Datastreams"
+  override lazy val tableName = "datastreams"
 
   // Inserting has a bit of boilerplate on its on.
   // But it's almost always a once per table thing, hopefully bearable.

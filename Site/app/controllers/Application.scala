@@ -18,7 +18,7 @@ import com.websudos.phantom.CassandraTable
 import com.websudos.phantom.Implicits._
 import com.websudos.phantom.column.{SetColumn, DateTimeColumn}
 import com.websudos.phantom.iteratee.Iteratee
-import scala.concurrent.Future
+
 
 object Application extends Controller {
 
@@ -37,37 +37,11 @@ object Application extends Controller {
       Unauthorized(views.html.unauthorized())
   }
 
-  def getFeed(feedID: Int): String = {
-    val f: Future[Option[Feed]] = models.Feeds.getFeedById(feedID)
-
-    f onComplete {
-      case Success(feedOption) => {
-        feedOption match {
-          case Some(feed) =>
-            feed.feedID.toString
-          case None =>
-            "No data :("
-        }
-      }
-      case Failure(ex) =>
-        ex.getStackTrace.toString
-    }
-    ""
-  }
 
     def feed(feedID: Int) = Action {
-      Ok(getFeed(feedID))
-      /*f onSuccess {
-        case feedSucc => feedSucc match {
-          case Some(feed) =>
-            Ok(feed.feedID.toString)
-          case None =>
-            Ok("No data :(")
-        }
-      }
-      f onFailure {
-        case ex => NotFound(ex.getStackTrace.toString)
-      }*/
+      Await.result({
+        models.Feeds.getDatastreams(feedID).map(result => Ok(result.toString))
+      }, 500 millis)
 /*      if (models.Authorization.isAuthorized(0))
         if (feedID > 0 && models.Feeds.getList.exists(f => f.feedID == feedID)){
           val jsonObject = Json.toJson(
@@ -97,21 +71,17 @@ object Application extends Controller {
         Unauthorized(views.html.unauthorized())*/
     }
 
-  def feeds = Action {
+  def feeds = Action{
     //Create tables
     //Await.result(models.Feeds.createTable, 5000 millis)
     //Await.result(models.Datastreams.createTable, 5000 millis)
     //Await.result(models.Userstates.createTable, 5000 millis)
-//    if (models.Authorization.isAuthorized(0)) {
-      val f = future {
-        Feeds.getList
-      }
-      f onSuccess {
-        case feedList: Seq[Feed] => Ok(views.html.feeds(feedList))
-      }
-    Ok("")
-    //}
-    //else
-    //  Unauthorized(views.html.unauthorized())
+    if (models.Authorization.isAuthorized(0)) {
+      Await.result({
+        Feeds.getList.map(list => Ok(views.html.feeds(list)))
+      }, 500 millis)
+    }
+    else
+      Unauthorized(views.html.unauthorized())
   }
 }
