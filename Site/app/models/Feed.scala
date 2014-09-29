@@ -1,4 +1,7 @@
 package models
+
+import java.util.UUID
+
 import org.joda.time.DateTime
 import com.twitter.conversions.time._
 import scala.concurrent.{ Future => ScalaFuture }
@@ -7,6 +10,7 @@ import com.websudos.phantom.Implicits._
 
 
 case class Datastream(
+uuid: UUID,
 feedID: Int,
 streamID: String,
 currentValue: String,
@@ -25,7 +29,7 @@ case class Feed(
                               creator: String,
                               version: String,
                               // Store datastream IDs
-                              datastreams: List[Int]
+                              datastreams: List[UUID]
                               )
 object Feed{}
 

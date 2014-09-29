@@ -1,5 +1,7 @@
 package models
 
+import java.util.UUID
+
 import com.datastax.driver.core.{ResultSet, Row}
 import com.websudos.phantom.CassandraTable
 import com.websudos.phantom.Implicits._
@@ -10,9 +12,10 @@ import com.websudos.phantom.iteratee.Iteratee
 import scala.concurrent.Future
 
 abstract case class Datastreams extends CassandraTable[Datastreams, Datastream]{
-  object feedID extends IntColumn(this) with PartitionKey[Int]{
-    override lazy val name = "feedID"
+  object uuid extends UUIDColumn(this) with PartitionKey[UUID]{
+    override lazy val name = "uuid"
   }
+  object feedID extends IntColumn(this)
   object streamID extends StringColumn(this)
   object currentValue extends StringColumn(this)
   object maxValue extends OptionalStringColumn(this)
@@ -26,7 +29,8 @@ object Datastreams extends Datastreams with MyDBConnector {
   // But it's almost always a once per table thing, hopefully bearable.
   // Whatever values you leave out will be inserted as nulls into Cassandra.
   def insertNewRecord(ds: Datastream): Future[ResultSet] = {
-    insert.value(_.feedID, ds.feedID)
+    insert.value(_.uuid, ds.uuid)
+      .value(_.feedID, ds.feedID)
       .value(_.streamID, ds.streamID)
       .value(_.currentValue, ds.currentValue)
       .value(_.maxValue, ds.maxValue)
@@ -35,7 +39,7 @@ object Datastreams extends Datastreams with MyDBConnector {
       .future()
   }
 
-  override def fromRow(r: Row): Datastream = Datastream(feedID(r), streamID(r), currentValue(r), maxValue(r), minValue(r));
+  override def fromRow(r: Row): Datastream = Datastream(uuid(r), feedID(r), streamID(r), currentValue(r), maxValue(r), minValue(r));
   // now you have the full power of Cassandra in really cool one liners.
   // The future will do all the heavy lifting for you.
   // If there is an error you get a failed Future.
@@ -44,8 +48,8 @@ object Datastreams extends Datastreams with MyDBConnector {
   // It will always have a LIMIT 1 in the query sent to Cassandra.
   // select.where(_.id eqs UUID.randomUUID()).one() translates to
   // SELECT * FROM my_custom_table WHERE id = the_id_value LIMIT 1;
-  def getDatastreamByFeedId(feedID: Int): Future[Option[Datastream]] = {
-    select.where(_.feedID eqs feedID).one()
+  def getDatastreams(feedID: Int): Future[Seq[Datastream]] = {
+    select.fetch()
   }
   /*
       // Because you are using a partition key, you can successfully using ordering

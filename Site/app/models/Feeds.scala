@@ -1,12 +1,12 @@
 package models
 
+import java.util.UUID
+
 import com.datastax.driver.core.{ResultSet, Row}
 import com.websudos.phantom.CassandraTable
 import com.websudos.phantom.Implicits._
-import com.websudos.phantom.column.{SetColumn, DateTimeColumn}
+import com.websudos.phantom.column.DateTimeColumn
 import com.twitter.conversions.time._
-
-import com.websudos.phantom.iteratee.Iteratee
 import scala.concurrent.Future
 
 abstract case class Feeds extends CassandraTable[Feeds, Feed]{
@@ -20,7 +20,7 @@ abstract case class Feeds extends CassandraTable[Feeds, Feed]{
   object created extends DateTimeColumn(this)
   object creator extends StringColumn(this)
   object version extends StringColumn(this)
-  object datastreams extends ListColumn[Feeds, Feed, Int](this)
+  object datastreams extends ListColumn[Feeds, Feed, UUID](this)
 }
 object Feeds extends Feeds with MyDBConnector {
   // you can even rename the table in the schema to whatever you like.
@@ -58,59 +58,11 @@ object Feeds extends Feeds with MyDBConnector {
 
   // com.websudos.phantom allows partial selects from any query.
   // this is currently limited to 22 fields.
-  def getDatastreams(feedID: Int): Future[Option[List[Int]]] = {
+  def getDatastreams(feedID: Int): Future[Option[List[UUID]]] = {
     select(_.datastreams).where(_.feedID eqs feedID).one()
   }
 
   def getList: Future[Seq[Feed]] = {
     select.fetch
   }
-  /*
-      // Because you are using a partition key, you can successfully using ordering
-      // And you can pagina}te your records.
-      // That's it, a really cool one liner.
-      // The fetch method will collect an asynchronous lazy iterator into a Seq.
-      // It's a good way to avoid boilerplate when retrieving a small number of items.
-      def getFeedsPage(start: UUID, limit: Int): ScalaFuture[Seq[Feed]] = {
-        select.where(_.id gtToken start).limit(limit).fetch()
-
-
-
-      // The fetchEnumerator method is the real power behind the scenes.
-      // You can retrieve a whole table, even with billions of records, in a single query.
-      // Phantom will collect them into an asynchronous, lazy iterator with very low memory foot print.
-      // Enumerators, iterators and iteratees are based on Play iteratees.
-      // You can keep the async behaviour or collect through the Iteratee.
-      def getEntireTable: ScalaFuture[Seq[Feed]] = {
-        select.fetchEnumerator() run Iteratee.collect()
-      }
-
-
-      // com.websudos.phantom supports a few more Iteratee methods.
-      // However, if you are looking to guarantee ordering and paginate "the old way"
-      // You need an OrderPreservingPartitioner.
-      def getFeedPage(start: Int, limit: Int): ScalaFuture[Iterator[Feed]] = {
-        select.fetchEnumerator() run Iteratee.slice(start, limit)
-      }
-
-
-      // Updating records is also really easy.
-      // Updating one record is done like this
-      def updateFeedAuthor(id: UUID, author: String): ScalaFuture[ResultSet] = {
-        update.where(_.id eqs id).modify(_.author setTo author).future()
-      }
-
-      // Updating records is also really easy.
-      // Updating multiple fields at the same time is also easy.
-      def updateFeedAuthorAndName(id: UUID, name: String, author: String): ScalaFuture[ResultSet] = {
-        update.where(_.id eqs id).modify(_.name setTo name)
-          .and(_.author setTo author)
-          .future()
-      }
-
-      // Deleting records has the same restrictions and selecting.
-      // If something is non primary, you cannot have it in a where clause.
-      def deleteFeedById(id: UUID): ScalaFuture[ResultSet] = {
-        delete.where(_.id eqs id).future()
-      }*/
 }

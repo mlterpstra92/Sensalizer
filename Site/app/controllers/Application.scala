@@ -40,7 +40,11 @@ object Application extends Controller {
 
     def feed(feedID: Int) = Action {
       Await.result({
-        models.Feeds.getDatastreams(feedID).map(result => Ok(result.toString))
+        models.Feeds.getDatastreams(feedID).map(result => {
+          println(result.toString)
+          Ok(result.toString)
+        })
+
       }, 500 millis)
 /*      if (models.Authorization.isAuthorized(0))
         if (feedID > 0 && models.Feeds.getList.exists(f => f.feedID == feedID)){
@@ -73,9 +77,10 @@ object Application extends Controller {
 
   def feeds = Action{
     //Create tables
-    //Await.result(models.Feeds.createTable, 5000 millis)
+    Await.result(models.Feeds.createTable, 5000 millis)
     //Await.result(models.Datastreams.createTable, 5000 millis)
     //Await.result(models.Userstates.createTable, 5000 millis)
+
     if (models.Authorization.isAuthorized(0)) {
       Await.result({
         Feeds.getList.map(list => Ok(views.html.feeds(list)))
