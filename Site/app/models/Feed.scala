@@ -25,9 +25,7 @@ case class Feed(
                               updated: DateTime,
                               created: DateTime,
                               creator: String,
-                              version: String,
-                              // Store datastream IDs
-                              datastreams: List[UUID]
+                              version: String
                               )
 object Feed{}
 

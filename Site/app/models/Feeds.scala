@@ -20,7 +20,6 @@ abstract case class Feeds extends CassandraTable[Feeds, Feed]{
   object created extends DateTimeColumn(this)
   object creator extends StringColumn(this)
   object version extends StringColumn(this)
-  object datastreams extends ListColumn[Feeds, Feed, UUID](this)
 }
 object Feeds extends Feeds with MyDBConnector {
   // you can even rename the table in the schema to whatever you like.
@@ -38,12 +37,11 @@ object Feeds extends Feeds with MyDBConnector {
       .value(_.created, feed.created)
       .value(_.creator, feed.creator)
       .value(_.version, feed.version)
-      .value(_.datastreams, feed.datastreams)
       .ttl(150.minutes.inSeconds) // you can use TTL if you want to.
       .future()
   }
 
-  override def fromRow(r: Row): Feed = Feed(feedID(r), title(r), priv(r), url(r), updated(r), created(r), creator(r), version(r), datastreams(r));
+  override def fromRow(r: Row): Feed = Feed(feedID(r), title(r), priv(r), url(r), updated(r), created(r), creator(r), version(r));
   // now you have the full power of Cassandra in really cool one liners.
   // The future will do all the heavy lifting for you.
   // If there is an error you get a failed Future.
@@ -54,12 +52,6 @@ object Feeds extends Feeds with MyDBConnector {
   // SELECT * FROM my_custom_table WHERE id = the_id_value LIMIT 1;
   def getFeedById(feedID: Int): Future[Option[Feed]] = {
     select.where(_.feedID eqs feedID).one()
-  }
-
-  // com.websudos.phantom allows partial selects from any query.
-  // this is currently limited to 22 fields.
-  def getDatastreams(feedID: Int): Future[Option[List[UUID]]] = {
-    select(_.datastreams).where(_.feedID eqs feedID).one()
   }
 
   def getList: Future[Seq[Feed]] = {

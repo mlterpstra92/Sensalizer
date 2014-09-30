@@ -6,15 +6,15 @@ import com.datastax.driver.core.{ResultSet, Row}
 import com.websudos.phantom.CassandraTable
 import com.websudos.phantom.Implicits._
 import com.websudos.phantom.column.{SetColumn, DateTimeColumn}
-import com.twitter.conversions.time._
-
+//import com.twitter.conversions.time._
+import scala.concurrent.duration._
 import com.websudos.phantom.iteratee.Iteratee
 import org.joda.time.DateTime
-import scala.concurrent.Future
+import scala.concurrent.{Await, Future}
 
 abstract case class Datastreams extends CassandraTable[Datastreams, Datastream]{
   object feedID extends IntColumn(this) with PartitionKey[Int]
-  object streamID extends StringColumn(this)
+  object streamID extends StringColumn(this) with Index[String]
   object currentValue extends FloatColumn(this)
   object insertionTime extends DateTimeColumn(this) with PrimaryKey[DateTime] with ClusteringOrder[DateTime] with Descending
 
@@ -32,7 +32,7 @@ object Datastreams extends Datastreams with MyDBConnector {
       .value(_.streamID, ds.streamID)
       .value(_.currentValue, ds.currentValue)
       .value(_.insertionTime, ds.insertionTime)
-      .ttl(150.minutes.inSeconds) // you can use TTL if you want to.
+      //.ttl(150 minutes) // you can use TTL if you want to.
       .future()
   }
 
@@ -45,9 +45,15 @@ object Datastreams extends Datastreams with MyDBConnector {
   // It will always have a LIMIT 1 in the query sent to Cassandra.
   // select.where(_.id eqs UUID.randomUUID()).one() translates to
   // SELECT * FROM my_custom_table WHERE id = the_id_value LIMIT 1;
-  def getDatastreams(feedID: Int): Future[Seq[Datastream]] = {
-    select.where(_.feedID eqs feedID).fetch()
+  def getDatastreamIDs(feedID: Int): Future[Seq[String]] = {
+    select(_.streamID).where(_.feedID eqs feedID).fetch()
   }
+
+  def getDataValueByStreamID(feedID: Int, streamID: String): Future[Seq[Float]] = {
+    select(_.currentValue).where(_.feedID eqs feedID).and(_.streamID eqs streamID).fetch()
+  }
+
+
 
   /*
       // Because you are using a partition key, you can successfully using ordering

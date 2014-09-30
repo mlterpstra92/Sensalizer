@@ -1,10 +1,11 @@
 package controllers
 
 
-import models.{Feed, Feeds, Authorization, Login}
+import models._
 import org.joda.time.DateTime
 import play.api._
 import play.api.mvc._
+import scala.collection.mutable
 import scala.concurrent._
 import scala.util.{Success, Failure}
 import play.api.libs.json._
@@ -18,7 +19,7 @@ import com.websudos.phantom.CassandraTable
 import com.websudos.phantom.Implicits._
 import com.websudos.phantom.column.{SetColumn, DateTimeColumn}
 import com.websudos.phantom.iteratee.Iteratee
-
+import scala.collection.mutable.MutableList
 
 object Application extends Controller {
 
@@ -38,15 +39,73 @@ object Application extends Controller {
   }
 
 
-    def feed(feedID: Int) = Action {
-      Await.result({
-        models.Feeds.getDatastreams(feedID).map(result => {
-          println(result.toString)
-          Ok(result.toString)
-        })
 
-      }, 500 millis)
-      
+  def createJsonFromDatastreams(feedID: Int, datastreams: Seq[String]): String = {
+    var labels = MutableList[String]();
+    var jsonLabels = MutableList[JsValue]();
+    for (ds <- datastreams) {
+      labels += ds
+      jsonLabels += Json.toJson(ds)
+    }
+    labels.distinct
+
+
+
+    val jsonObject = Json.toJson(
+      Map(
+        "labels" -> jsonLabels,
+        "datasets" -> Seq(Json.toJson(labels.map { label => {
+          Await.result(models.Datastreams.getDataValueByStreamID(feedID, label), 500 millis).map(value => {
+            Map(
+              "label" -> Json.toJson(label),
+              "fillColor" -> Json.toJson("rgba(220,220,220,0.2)"),
+              "strokeColor" -> Json.toJson("rgba(220,220,220,1)"),
+              "pointColor" -> Json.toJson("rgba(220,220,220,1)"),
+              "pointStrokeColor" -> Json.toJson("#fff"),
+              "pointHighlightFill" -> Json.toJson("#fff"),
+              "pointHighlightStroke" -> Json.toJson("rgba(220,220,220,1)"),
+              "data" -> Json.toJson(List(value))
+            )
+          }
+          )
+        }
+        }
+      )
+      )
+    )
+    )
+        /*for (label <- labels) {
+          var outerRes: Seq[Float] = null
+          Await.result(models.Datastreams.getDataValueByStreamID(feedID, label.toString).map(res2 => {
+            outerRes = res2
+          }), 500 millis);
+
+          "datasets" -> Seq(
+
+            Json.toJson(
+              Map(
+                "label" -> Json.toJson(label),
+                "fillColor" -> Json.toJson("rgba(220,220,220,0.2)"),
+                "strokeColor" -> Json.toJson("rgba(220,220,220,1)"),
+                "pointColor" -> Json.toJson("rgba(220,220,220,1)"),
+                "pointStrokeColor" -> Json.toJson("#fff"),
+                "pointHighlightFill" -> Json.toJson("#fff"),
+                "pointHighlightStroke" -> Json.toJson("rgba(220,220,220,1)"),
+                "data" -> Json.toJson(outerRes))
+            )
+          )
+        }*/
+   // print(Json.stringify(jsonObject))
+    val q = Json.stringify(jsonObject)
+    println(q)
+    q
+  }
+
+  def feed(feedID: Int) = Action {
+      Await.result(models.Datastreams.getDatastreamIDs(feedID).map(res => {
+        Ok(createJsonFromDatastreams(feedID, res)).as("application/json")
+      }), 500 millis);
+
 /*      if (models.Authorization.isAuthorized(0))
         if (feedID > 0 && models.Feeds.getList.exists(f => f.feedID == feedID)){
           val jsonObject = Json.toJson(
