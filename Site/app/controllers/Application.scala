@@ -23,7 +23,7 @@ import com.websudos.phantom.iteratee.Iteratee
 object Application extends Controller {
 
   def index = Action {
-    if (models.Login.loggedIn(0))
+    if (models.Login.getLoggedInUser(0) != null)
       Ok(views.html.index(0))
     else
       Ok(views.html.promo())
@@ -77,7 +77,7 @@ object Application extends Controller {
 
   def feeds = Action{
     //Create tables
-    Await.result(models.Feeds.createTable, 5000 millis)
+    //Await.result(models.Feeds.createTable, 5000 millis)
     //Await.result(models.Datastreams.createTable, 5000 millis)
     //Await.result(models.Userstates.createTable, 5000 millis)
 

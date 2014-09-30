@@ -16,3 +16,5 @@ libraryDependencies ++= Seq(
   //"com.websudos"  %% "phantom-testing"               % phantomVersion,
   "com.websudos"  %% "phantom-udt"                   % phantomVersion
 )
+
+libraryDependencies += "ws.securesocial" %% "securesocial" % "2.1.4"

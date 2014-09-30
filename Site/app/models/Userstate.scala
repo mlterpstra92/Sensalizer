@@ -45,10 +45,13 @@ object Userstates extends Userstates with MyDBConnector {
     select.where(_.userID eqs userID).one()
   }
 
-  def getUsers(): Future[Seq[Userstate]] = {
+  def getUsers: Future[Seq[Userstate]] = {
     select.fetchEnumerator() run Iteratee.collect()
   }
-  /*
+
+  def deleteUser(id: Int) = {
+    delete.where(_.userID eqs id).future()
+  }  /*
       // Because you are using a partition key, you can successfully using ordering
       // And you can pagina}te your records.
       // That's it, a really cool one liner.
