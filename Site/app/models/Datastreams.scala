@@ -46,8 +46,9 @@ object Datastreams extends Datastreams with MyDBConnector {
   // select.where(_.id eqs UUID.randomUUID()).one() translates to
   // SELECT * FROM my_custom_table WHERE id = the_id_value LIMIT 1;
   def getDatastreams(feedID: Int): Future[Seq[Datastream]] = {
-    select.fetch()
+    select.where(_.feedID eqs feedID).fetch()
   }
+
   /*
       // Because you are using a partition key, you can successfully using ordering
       // And you can pagina}te your records.

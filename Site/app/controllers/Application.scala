@@ -76,11 +76,15 @@ object Application extends Controller {
         Unauthorized(views.html.unauthorized())*/
     }
 
+
+
   def feeds = Action{
     //Create tables
     //Await.result(models.Feeds.createTable, 5000 millis)
     //Await.result(models.Datastreams.createTable, 5000 millis)
     //Await.result(models.Userstates.createTable, 5000 millis)
+
+
 
     if (models.Authorization.isAuthorized(0)) {
       Await.result({

@@ -32,4 +32,5 @@ object Login {
   def logoutUser(userID: Int) = {
     Await.result(Userstates.deleteUser(userID), 500 millis)
   }
+
 }
