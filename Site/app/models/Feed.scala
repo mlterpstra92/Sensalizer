@@ -10,12 +10,10 @@ import com.websudos.phantom.Implicits._
 
 
 case class Datastream(
-uuid: UUID,
 feedID: Int,
 streamID: String,
-currentValue: String,
-maxValue: Option[String],
-minValue: Option[String])
+currentValue: Float,
+insertionTime: DateTime)
 
 object Datastream{}
 

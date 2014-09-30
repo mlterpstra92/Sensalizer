@@ -46,6 +46,7 @@ object Application extends Controller {
         })
 
       }, 500 millis)
+      
 /*      if (models.Authorization.isAuthorized(0))
         if (feedID > 0 && models.Feeds.getList.exists(f => f.feedID == feedID)){
           val jsonObject = Json.toJson(

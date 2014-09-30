@@ -9,17 +9,15 @@ import com.websudos.phantom.column.{SetColumn, DateTimeColumn}
 import com.twitter.conversions.time._
 
 import com.websudos.phantom.iteratee.Iteratee
+import org.joda.time.DateTime
 import scala.concurrent.Future
 
 abstract case class Datastreams extends CassandraTable[Datastreams, Datastream]{
-  object uuid extends UUIDColumn(this) with PartitionKey[UUID]{
-    override lazy val name = "uuid"
-  }
-  object feedID extends IntColumn(this)
+  object feedID extends IntColumn(this) with PartitionKey[Int]
   object streamID extends StringColumn(this)
-  object currentValue extends StringColumn(this)
-  object maxValue extends OptionalStringColumn(this)
-  object minValue extends OptionalStringColumn(this)
+  object currentValue extends FloatColumn(this)
+  object insertionTime extends DateTimeColumn(this) with PrimaryKey[DateTime] with ClusteringOrder[DateTime] with Descending
+
 }
 object Datastreams extends Datastreams with MyDBConnector {
   // you can even rename the table in the schema to whatever you like.
@@ -29,17 +27,16 @@ object Datastreams extends Datastreams with MyDBConnector {
   // But it's almost always a once per table thing, hopefully bearable.
   // Whatever values you leave out will be inserted as nulls into Cassandra.
   def insertNewRecord(ds: Datastream): Future[ResultSet] = {
-    insert.value(_.uuid, ds.uuid)
+    insert
       .value(_.feedID, ds.feedID)
       .value(_.streamID, ds.streamID)
       .value(_.currentValue, ds.currentValue)
-      .value(_.maxValue, ds.maxValue)
-      .value(_.minValue, ds.minValue)
+      .value(_.insertionTime, ds.insertionTime)
       .ttl(150.minutes.inSeconds) // you can use TTL if you want to.
       .future()
   }
 
-  override def fromRow(r: Row): Datastream = Datastream(uuid(r), feedID(r), streamID(r), currentValue(r), maxValue(r), minValue(r));
+  override def fromRow(r: Row): Datastream = Datastream(feedID(r), streamID(r), currentValue(r), insertionTime(r));
   // now you have the full power of Cassandra in really cool one liners.
   // The future will do all the heavy lifting for you.
   // If there is an error you get a failed Future.

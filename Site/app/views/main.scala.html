@@ -35,13 +35,7 @@
             }
         </style>
         <script>
-
-        var globalFeedID = null;
-
         $(document ).ready(function(){
-            this.watch('globalFeedID', function(){
-                console.log(globalFeedID);
-            });
             var data = {
                 labels: ["January", "February", "March", "April", "May", "June", "July"],
                 datasets:
@@ -98,7 +92,6 @@
                 if (e.currentTarget.id == "selectFeed"){
                                  //this     td       tr        first td      its data without spaces
                     var feedID = $(this).parent().parent().find('td')[0].innerHTML.trim();
-                    globalFeedID = feedID;
                     $.ajax({
                         url: "feed/"+feedID,
                         method: 'GET',
@@ -111,6 +104,32 @@
                             alert(thrownError);
                         }
                     });
+                    if(typeof(EventSource) !== "undefined") {
+                        var source = new EventSource("https://api.xively.com/v2/feeds/" + feedID + ".json");
+                        source.onmessage = function(event) {
+                            console.log(event);
+                        };
+                    } else {
+                        document.getElementById("result").innerHTML = "Sorry, your browser does not support server-sent events...";
+                    }
+                    console.log(source);
+
+                    source.addEventListener('message', function(e) {
+                        console.log(e.data);
+                    }, false);
+
+                    source.addEventListener('open', function(e) {
+                        console.log("open");
+                        // Connection was opened.
+                    }, false);
+
+                    source.addEventListener('error', function(e) {
+                        if (e.readyState == EventSource.CLOSED) {
+                            console.log("error, close");
+                            // Connection was closed.
+                        }
+                    }, false);
+
                 }
             });
         });
