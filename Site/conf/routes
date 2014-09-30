@@ -13,4 +13,3 @@ GET        /profile/:userID        controllers.Application.profile(userID: Int)
 GET        /feeds                  controllers.Application.feeds
 GET        /feed/:feedID           controllers.Application.feed(feedID: Int)
 
-    
