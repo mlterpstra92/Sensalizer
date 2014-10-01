@@ -46,12 +46,12 @@ object Application extends Controller {
           Await.result(models.Datastreams.getDataValueByStreamID(feedID, label), 500 millis).map(value => {
             Map(
               "label" -> Json.toJson(label),
-              "fillColor" -> Json.toJson("rgba(220,220,220,0.2)"),
-              "strokeColor" -> Json.toJson("rgba(220,220,220,1)"),
-              "pointColor" -> Json.toJson("rgba(220,220,220,1)"),
+              "fillColor" -> Json.toJson("rgba(0,200,200,0.4)"),
+              "strokeColor" -> Json.toJson("rgba(0,200,200,1)"),
+              "pointColor" -> Json.toJson("rgba(0,200,200,1)"),
               "pointStrokeColor" -> Json.toJson("#fff"),
               "pointHighlightFill" -> Json.toJson("#fff"),
-              "pointHighlightStroke" -> Json.toJson("rgba(220,220,220,1)"),
+              "pointHighlightStroke" -> Json.toJson("rgba(0,200,200,1)"),
               "data" -> Json.toJson(List(value))
             )
           })
