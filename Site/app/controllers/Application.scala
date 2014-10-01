@@ -50,11 +50,11 @@ object Application extends Controller {
     labels.distinct
 
 
-
     val jsonObject = Json.toJson(
       Map(
         "labels" -> jsonLabels,
         "datasets" -> Seq(Json.toJson(labels.map { label => {
+
           Await.result(models.Datastreams.getDataValueByStreamID(feedID, label), 500 millis).map(value => {
             Map(
               "label" -> Json.toJson(label),

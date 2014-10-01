@@ -62,6 +62,7 @@
                     }
                 ]
             };
+            console.log(data);
         var ratio = $("#canvasContainer").height()/$("#canvasContainer").width();
         //Get the context of the canvas element we want to select
         var c = $('#feedGraph');
@@ -97,7 +98,14 @@
                         method: 'GET',
                         content: 'json',
                         success: function (d) {
-                            new Chart(ct).Bar(d, options);
+                            d.datasets = d.datasets[0];
+                            for (var i = 0; i < d.datasets.length; ++i)
+                                d.datasets[i] = d.datasets[i][0];
+                            console.log(d);
+                            if (d.datasets[0 ].data.length == 1)
+                                new Chart(ct).Bar(d, options);
+                            else
+                                new Chart(ct ).Line(d, options)
                         },
                         error: function (xhr, ajaxOptions, thrownError) {
                             alert(xhr.status);
