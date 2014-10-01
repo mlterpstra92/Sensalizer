@@ -1,4 +1,4 @@
-@(feeds: Seq[Feed])
+@(feeds: Seq[Feed], apiKey: String)
 
 <div class="modal-header">
     <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
@@ -21,6 +21,9 @@
                     </td>
                     <td>
                         <button type="button" id="selectFeed" class="btn btn-primary btn-large" data-dismiss="modal">View feed</button>
+                    </td>
+                    <td style="display: none">
+                        @apiKey
                     </td>
                 </tr>
             }

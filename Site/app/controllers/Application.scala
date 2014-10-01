@@ -3,6 +3,7 @@ package controllers
 
 import com.websudos.phantom.Implicits._
 import models.Feeds
+import play.api.libs.EventSource
 import play.api.libs.json._
 import play.api.mvc._
 
@@ -36,7 +37,8 @@ object Application extends Controller {
       labels += ds
       jsonLabels += Json.toJson(ds)
     }
-    labels.distinct
+    labels = labels.distinct
+    jsonLabels = jsonLabels.distinct
 
     val jsonObject = Json.toJson(
       Map(
@@ -44,6 +46,8 @@ object Application extends Controller {
         "datasets" -> Seq(Json.toJson(labels.map { label => {
 
           Await.result(models.Datastreams.getDataValueByStreamID(feedID, label), 500 millis).map(value => {
+            println(value)
+            
             Map(
               "label" -> Json.toJson(label),
               "fillColor" -> Json.toJson("rgba(0,200,200,0.4)"),
@@ -65,18 +69,19 @@ object Application extends Controller {
     Await.result(models.Datastreams.getDatastreamIDs(feedID).map(res => {
       Ok(createJsonFromDatastreams(feedID, res)).as("application/json")
     }), 500 millis)
+
   }
 
 
 
-  def feeds = Action{
+  def feeds(userID: Int) = Action{
     //Create tables
     //Await.result(models.Feeds.createTable, 5000 millis)
     //Await.result(models.Datastreams.createTable, 5000 millis)
     //Await.result(models.Userstates.createTable, 5000 millis)
     if (models.Authorization.isAuthorized(0)) {
       Await.result({
-        Feeds.getList.map(list => Ok(views.html.feeds(list)))
+        Feeds.getList.map(list => Ok(views.html.feeds(list, models.Login.getLoggedInUser(userID).APIKey)))
       }, 500 millis)
     }
     else

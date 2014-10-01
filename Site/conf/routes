@@ -10,6 +10,6 @@ GET        /assets/*file           controllers.Assets.at(path="/public", file)
 
 # View your profile
 GET        /profile/:userID        controllers.Application.profile(userID: Int)
-GET        /feeds                  controllers.Application.feeds
+GET        /feeds/:userID          controllers.Application.feeds(userID: Int)
 GET        /feed/:feedID           controllers.Application.feed(feedID: Int)
 
