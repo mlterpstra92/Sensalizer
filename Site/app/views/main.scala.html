@@ -74,9 +74,20 @@
         /*************************************************************************/
         //Run function when window resizes
         $(window).resize(respondCanvas);
+        var steps = 3;
+        var max = 100;
         var options = {
-            responsive: true
-        };
+            animation : false,
+            responsive : true,
+            animationEasing: 'easeOutQuart',
+            animationSteps: 500,
+            segmentShowStroke: true,
+            segmentStrokeColor: 'FFF',
+            scaleOverride: true,
+            scaleSteps: steps,
+            scaleStepWidth: Math.ceil(max / steps),
+            scaleStartValue: 0
+        }
 
         function respondCanvas() {
             c.attr('width', $("#canvasContainer").width());
@@ -97,11 +108,8 @@
                 if (e.currentTarget.id == "selectFeed"){
                                  //this     td       tr        first td      its data without spaces
                     var feedID = $(this).parent().parent().find('td')[0].innerHTML.trim();
-                    var apiKey = $(this ).parent( ).parent( ).find('td')[3 ].innerHTML.trim();
+                    var apiKey = $(this ).parent().parent().find('td')[3].innerHTML.trim();
                     xively.setKey( apiKey );
-                    xively.feed.get( "504", function( data ) {
-                        console.log( data ); // Logs the feed title
-                    });
                 $.ajax({
                         url: "feed/"+feedID,
                         method: 'GET',
@@ -111,11 +119,27 @@
                             for (var i = 0; i < d.datasets.length; ++i)
                                 d.datasets[i] = d.datasets[i][0];
 
-                            console.log(d);
-                            if (d.datasets[0 ].data.length == 1)
-                                new Chart(ct).Bar(d, options);
-                            else
-                                new Chart(ct ).Line(d, options)
+                            if ( d.datasets.length != 0)
+                                new Chart ( ct ).Line ( d, options );
+
+                            d.labels = [];
+                            xively.feed.subscribe(feedID, function(event, data){
+                                var label = data.updated.split('T' )[1].split('.' )[0];
+
+                                d.labels.push(label);
+                                if (d.datasets[0 ].label != data.datastreams[0 ].id)
+                                    data.datastreams = data.datastreams.reverse();
+                                for (var i = 0; i < d.datasets.length; ++i) {
+                                    d.datasets[ i ].label = label ;
+                                    d.datasets[ i ].data.push ( data.datastreams[ i ].current_value );
+                                    if (d.datasets[i ].data.length > 10 && d.labels.length > 10)
+                                    {
+                                        d.datasets[i ].data = d.datasets[i ].data.slice( 1) ;
+                                        d.labels = d.labels.slice( 1);
+                                    }
+                                }
+                                new Chart(ct ).Line(d, options);
+                            });
                         },
                         error: function (xhr, ajaxOptions, thrownError) {
                             alert(xhr.status);
