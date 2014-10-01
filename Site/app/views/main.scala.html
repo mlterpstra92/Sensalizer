@@ -62,7 +62,6 @@
                     }
                 ]
             };
-            console.log(data);
         var ratio = $("#canvasContainer").height()/$("#canvasContainer").width();
         //Get the context of the canvas element we want to select
         var c = $('#feedGraph');
@@ -101,7 +100,7 @@
                             d.datasets = d.datasets[0];
                             for (var i = 0; i < d.datasets.length; ++i)
                                 d.datasets[i] = d.datasets[i][0];
-                            console.log(d);
+
                             if (d.datasets[0 ].data.length == 1)
                                 new Chart(ct).Bar(d, options);
                             else
@@ -112,43 +111,9 @@
                             alert(thrownError);
                         }
                     });
-                    if(typeof(EventSource) !== "undefined") {
-                        var source = new EventSource("https://api.xively.com/v2/feeds/" + feedID + ".json");
-                        source.onmessage = function(event) {
-                            console.log(event);
-                        };
-                    } else {
-                        document.getElementById("result").innerHTML = "Sorry, your browser does not support server-sent events...";
-                    }
-                    console.log(source);
-
-                    source.addEventListener('message', function(e) {
-                        console.log(e.data);
-                    }, false);
-
-                    source.addEventListener('open', function(e) {
-                        console.log("open");
-                        // Connection was opened.
-                    }, false);
-
-                    source.addEventListener('error', function(e) {
-                        if (e.readyState == EventSource.CLOSED) {
-                            console.log("error, close");
-                            // Connection was closed.
-                        }
-                    }, false);
-
                 }
             });
         });
-        function sleep(milliseconds) {
-            var start = new Date().getTime();
-            for (var i = 0; i < 1e7; i++) {
-                if ((new Date().getTime() - start) > milliseconds){
-                    break;
-                }
-            }
-        }
         </script>
     </head>
     <body>
