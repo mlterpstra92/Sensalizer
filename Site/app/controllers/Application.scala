@@ -2,13 +2,13 @@ package controllers
 
 
 import com.websudos.phantom.Implicits._
-import models.Feeds
+import models.{Feed, Feeds}
 import play.api.libs.EventSource
 import play.api.libs.json._
 import play.api.mvc._
 
 import scala.collection.mutable
-import scala.concurrent.Await
+import scala.concurrent.{Future, Await}
 import scala.concurrent.duration._
 
 object Application extends Controller {
@@ -32,22 +32,19 @@ object Application extends Controller {
 
   def createJsonFromDatastreams(feedID: Int, datastreams: Seq[String]): String = {
     var labels = mutable.MutableList[String]()
-    var jsonLabels = mutable.MutableList[JsValue]()
     for (ds <- datastreams) {
       labels += ds
-      jsonLabels += Json.toJson(ds)
     }
     labels = labels.distinct
-    jsonLabels = jsonLabels.distinct
 
     val jsonObject = Json.toJson(
       Map(
-        "labels" -> jsonLabels,
+        "labels" -> labels.map(Json.toJson(_)),
         "datasets" -> Seq(Json.toJson(labels.map { label => {
 
-          Await.result(models.Datastreams.getDataValueByStreamID(feedID, label), 500 millis).map(value => {
+          Await.result(models.Datastreams.getDataValueByStreamID(feedID, label), 1500 millis).map(value => {
             println(value)
-            
+
             Map(
               "label" -> Json.toJson(label),
               "fillColor" -> Json.toJson("rgba(0,200,200,0.0)"),
@@ -66,11 +63,11 @@ object Application extends Controller {
   }
 
   def feed(feedID: Int) = Action {
-    Await.result(models.Datastreams.getDatastreamIDs(feedID).map(res => {
-      Ok(createJsonFromDatastreams(feedID, res)).as("application/json")
-    }), 500 millis)
-
-  }
+    val fFeed: Future[Seq[String]] = models.Datastreams.getDatastreamIDs(feedID)
+    Async {
+      fFeed.map(res => Ok(createJsonFromDatastreams(feedID, res)).as("application/json"))
+    }
+}
 
 
 
@@ -80,9 +77,10 @@ object Application extends Controller {
     //Await.result(models.Datastreams.createTable, 5000 millis)
     //Await.result(models.Userstates.createTable, 5000 millis)
     if (models.Authorization.isAuthorized(0)) {
-      Await.result({
-        Feeds.getList.map(list => Ok(views.html.feeds(list, models.Login.getLoggedInUser(userID).APIKey)))
-      }, 500 millis)
+      val fList: Future[Seq[Feed]] = Feeds.getList
+      Async {
+        fList.map{list => Ok(views.html.feeds(list, models.Login.getLoggedInUser(userID).APIKey))}
+      }
     }
     else
       Unauthorized(views.html.unauthorized())

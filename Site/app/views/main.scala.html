@@ -20,7 +20,7 @@
             <!-- Latest compiled and minified JavaScript -->
         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
 
-        <script src="//cdnjs.cloudflare.com/ajax/libs/Chart.js/0.2.0/Chart.min.js"></script>
+        <script src="@routes.Assets.at("javascripts/Chart.min.js")"></script>
         <script src="@routes.Assets.at("javascripts/object-watch.js")"></script>
         <link rel="stylesheet" media="screen" href="@routes.Assets.at("stylesheets/main.css")">
         <link rel="stylesheet" media="screen" href="@routes.Assets.at("stylesheets/style.css")">
@@ -77,23 +77,29 @@
         var steps = 3;
         var max = 100;
         var options = {
-            animation : false,
             responsive : true,
-            animationEasing: 'easeOutQuart',
-            animationSteps: 500,
-            segmentShowStroke: true,
-            segmentStrokeColor: 'FFF',
-            scaleOverride: true,
-            scaleSteps: steps,
-            scaleStepWidth: Math.ceil(max / steps),
-            scaleStartValue: 0
+            animation: false,
+            barValueSpacing : 5,
+            barDatasetSpacing : 1,
+            showTooltips: true
+
+        /*animation : false,
+        responsive : true/*,
+        animationEasing: 'easeOutQuart',
+        animationSteps: 500,
+        segmentShowStroke: true,
+        segmentStrokeColor: 'FFF',
+        scaleOverride: true,
+        scaleSteps: steps,
+        scaleStepWidth: Math.ceil(max / steps),
+        scaleStartValue: 0*/
         }
 
         function respondCanvas() {
             c.attr('width', $("#canvasContainer").width());
             c.attr('height', $("#canvasContainer").width()*(ratio));
             //Call a function to redraw other content (texts, images etc)
-            new Chart(ct).Line(data, options);
+            //new Chart(ct).Line(data, options);
         }
 
         //Initial call
