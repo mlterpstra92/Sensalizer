@@ -12,6 +12,7 @@ import com.websudos.phantom.Implicits._
 case class Datastream(
 feedID: Int,
 streamID: String,
+seqNo: Int,
 currentValue: Float,
 insertionTime: DateTime)
 

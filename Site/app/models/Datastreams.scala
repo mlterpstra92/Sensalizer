@@ -6,8 +6,8 @@ import com.datastax.driver.core.{ResultSet, Row}
 import com.websudos.phantom.CassandraTable
 import com.websudos.phantom.Implicits._
 import com.websudos.phantom.column.{SetColumn, DateTimeColumn}
-//import com.twitter.conversions.time._
-import scala.concurrent.duration._
+import com.twitter.conversions.time._
+//import scala.concurrent.duration._
 import com.websudos.phantom.iteratee.Iteratee
 import org.joda.time.DateTime
 import scala.concurrent.{Await, Future}
@@ -17,6 +17,7 @@ abstract case class Datastreams extends CassandraTable[Datastreams, Datastream]{
   object streamID extends StringColumn(this) with Index[String]
   object currentValue extends FloatColumn(this)
   object insertionTime extends DateTimeColumn(this) with PrimaryKey[DateTime] with ClusteringOrder[DateTime] with Descending
+  object seqNo extends IntColumn(this) with PrimaryKey[Int] with ClusteringOrder[Int] with Descending
 
 }
 object Datastreams extends Datastreams with MyDBConnector {
@@ -33,11 +34,12 @@ object Datastreams extends Datastreams with MyDBConnector {
       .value(_.streamID, ds.streamID)
       .value(_.currentValue, ds.currentValue)
       .value(_.insertionTime, ds.insertionTime)
-      //.ttl(150 minutes) // you can use TTL if you want to.
+      .value(_.seqNo, ds.seqNo)
+      .ttl(500.milliseconds.inSeconds) // you can use TTL if you want to.
       .future()
   }
 
-  override def fromRow(r: Row): Datastream = Datastream(feedID(r), streamID(r), currentValue(r), insertionTime(r));
+  override def fromRow(r: Row): Datastream = Datastream(feedID(r), streamID(r), seqNo(r), currentValue(r), insertionTime(r));
   // now you have the full power of Cassandra in really cool one liners.
   // The future will do all the heavy lifting for you.
   // If there is an error you get a failed Future.

@@ -93,8 +93,8 @@ $(document ).ready(function(){
         var inputID = "check"+id+":checked";
         return true;
         /*console.log($(inputID));
-        console.log($(inputID).attr('checked'));
-        return $(inputID).val();*/
+         console.log($(inputID).attr('checked'));
+         return $(inputID).val();*/
     }
     //Apparently, we eat click events, so use event delegation
     $(this ).on('click', 'button', function(e){
@@ -118,12 +118,16 @@ $(document ).ready(function(){
                     for (var i = 0; i < d.datasets.length; ++i)
                         d.datasets[i] = d.datasets[i][0];
 
+
                     $.each(d.datasets, function(idx, dataset){
                         var inputID = "check" + dataset.label;
 
-                       $("#graphModForm ul").append("<li><a href=\"#\"><input type=\"checkbox\" id=\"" + inputID + "\" checked><span class=\"lbl\">" + dataset.label + "</span></a></li>");
+                        $("#graphModForm ul").append("<li><a href=\"#\"><input type=\"checkbox\" id=\"" + inputID + "\" checked><span class=\"lbl\">" + dataset.label + "</span></a></li>");
                         $("#graphModForm ul > li > a").attr('checked', true);
                     });
+                    if (!d || d.datasets || d.datasets.length == 0)
+                        d = JSON.parse("{\"labels\":[\"x\",\"y\",\"z\",\"shake\"],\"datasets\":[{\"pointStrokeColor\":\"#fff\",\"data\":[14],\"label\":\"x\",\"pointHighlightFill\":\"#fff\",\"pointColor\":\"rgba(0,200,200,1)\",\"pointHighlightStroke\":\"rgba(0,200,200,1)\",\"strokeColor\":\"rgba(0,200,200,1)\",\"fillColor\":\"rgba(0,200,200,0.0)\"},{\"pointStrokeColor\":\"#fff\",\"data\":[14],\"label\":\"y\",\"pointHighlightFill\":\"#fff\",\"pointColor\":\"rgba(0,200,200,1)\",\"pointHighlightStroke\":\"rgba(0,200,200,1)\",\"strokeColor\":\"rgba(0,200,200,1)\",\"fillColor\":\"rgba(0,200,200,0.0)\"},{\"pointStrokeColor\":\"#fff\",\"data\":[14],\"label\":\"z\",\"pointHighlightFill\":\"#fff\",\"pointColor\":\"rgba(0,200,200,1)\",\"pointHighlightStroke\":\"rgba(0,200,200,1)\",\"strokeColor\":\"rgba(0,200,200,1)\",\"fillColor\":\"rgba(0,200,200,0.0)\"},{\"pointStrokeColor\":\"#fff\",\"data\":[14],\"label\":\"shake\",\"pointHighlightFill\":\"#fff\",\"pointColor\":\"rgba(0,200,200,1)\",\"pointHighlightStroke\":\"rgba(0,200,200,1)\",\"strokeColor\":\"rgba(0,200,200,1)\",\"fillColor\":\"rgba(0,200,200,0.0)\"}]}"); d.labels = [(hours + ":" + minutes + ":" + seconds)]; for (var i = 0; i < d.datasets.length - 1; ++i) d.labels.push("");
+
                     var now = new Date();
                     now.setSeconds(now.getSeconds() - 4);
                     var hours, minutes, seconds;
@@ -142,8 +146,7 @@ $(document ).ready(function(){
                         d.datasets[i].pointColor = colors[i];
                         d.datasets[i].strokeColor = colors[i];
                     }
-                    if (d && d.datasets && d.datasets.length > 0)
-                        var chart = new Chart(ct).Line(d, options);
+                    var chart = new Chart(ct).Line(d, options);
                     xively.feed.subscribe(feedID, function(event, data){
                         var emptyIndex = d.labels.indexOf("");
                         if (emptyIndex != -1)
@@ -174,18 +177,18 @@ $(document ).ready(function(){
                         else
                             chart.addData(vals, label);
                         /*$.ajax({
-                            url: 'datapush',
-                            type: 'POST',
-                            data: myData,
-                            contentType: "application/json; charset=utf-8",
-                            dataType: 'json',
-                            success: function(){
-                                console.log("WOOPWOOP");
-                            },
-                            error: function(e){
-                                console.log(e);
-                            }
-                        });*/
+                         url: 'datapush',
+                         type: 'POST',
+                         data: myData,
+                         contentType: "application/json; charset=utf-8",
+                         dataType: 'json',
+                         success: function(){
+                         console.log("WOOPWOOP");
+                         },
+                         error: function(e){
+                         console.log(e);
+                         }
+                         });*/
                         var connection = new WebSocket('ws://localhost:9000/datapush', 'json');
                         // When the connection is open, send some data to the server
                         connection.onopen = function () {
