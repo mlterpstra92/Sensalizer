@@ -53,17 +53,22 @@ $(document ).ready(function(){
          scaleSteps: steps,
          scaleStepWidth: Math.ceil(max / steps),
          scaleStartValue: 0*/
-    }
+    };
 
+    var chart;
     function respondCanvas() {
         c.attr('width', $("#canvasContainer").width());
         c.attr('height', $("#canvasContainer").width()*(ratio));
         //Call a function to redraw other content (texts, images etc)
-        //new Chart(ct).Line(data, options);
+        //chart = new Chart(ct).Line(data, options);
     }
 
     //Initial call
     respondCanvas();
+
+    function padLeft(nr, n, str){
+        return Array(n-String(nr).length+1).join(str||'0')+nr;
+    }
 
     //Apparently, we eat click events, so use event delegation
     $(this ).on('click', 'button', function(e){
@@ -85,27 +90,30 @@ $(document ).ready(function(){
                     for (var i = 0; i < d.datasets.length; ++i)
                         d.datasets[i] = d.datasets[i][0];
 
-                    if ( d.datasets.length != 0)
-                        new Chart ( ct ).Line ( d, options );
-
+                    var now = new Date();
+                    now.setSeconds(now.getSeconds() - 4);
+                    var hours, minutes, seconds;
+                    hours = padLeft(now.getUTCHours(), 2);
+                    minutes = padLeft(now.getUTCMinutes(), 2);
+                    seconds = padLeft(now.getUTCSeconds(), 2);
                     d.labels = [];
-                    xively.feed.subscribe(feedID, function(event, data){
-                        console.log(data);
-                        var label = data.updated.split('T' )[1].split('.' )[0];
 
-                        d.labels.push(label);
-                        if (d.datasets[0 ].label != data.datastreams[0 ].id)
-                            data.datastreams = data.datastreams.reverse();
-                        for (var i = 0; i < d.datasets.length; ++i) {
-                            d.datasets[ i ].label = label ;
-                            d.datasets[ i ].data.push ( data.datastreams[ i ].current_value );
-                            if (d.datasets[i ].data.length > 10 && d.labels.length > 10)
-                            {
-                                d.datasets[i ].data = d.datasets[i ].data.slice( 1) ;
-                                d.labels = d.labels.slice( 1);
-                            }
-                        }
-                        new Chart(ct ).Line(d, options);
+                    d.labels.push(hours + ":" + minutes + ":" + seconds);
+                    for (var i = 0; i < d.datasets.length - 1; ++i)
+                        d.labels.push("");
+
+                    var chart = new Chart(ct).Line(d, options);
+                    xively.feed.subscribe(feedID, function(event, data){
+                        var emptyIndex = d.labels.indexOf("");
+                        if (emptyIndex != -1)
+                            d.labels.splice(emptyIndex, 1);
+                        var label = data.updated.split('T' )[1].split('.' )[0];
+                        var vals = [];
+                        for (var i = 0; i < data.datastreams.length; ++i)
+                            vals.push(data.datastreams[i].current_value);
+
+                        chart.addData(vals, label);
+                        chart.update();
                     });
                 },
                 error: function (xhr, ajaxOptions, thrownError) {
