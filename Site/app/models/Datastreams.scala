@@ -35,7 +35,7 @@ object Datastreams extends Datastreams with MyDBConnector {
       .value(_.currentValue, ds.currentValue)
       .value(_.insertionTime, ds.insertionTime)
       .value(_.seqNo, ds.seqNo)
-      .ttl(500.milliseconds.inSeconds) // you can use TTL if you want to.
+      .ttl(10.minutes.inSeconds) // you can use TTL if you want to.
       .future()
   }
 

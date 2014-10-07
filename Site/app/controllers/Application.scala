@@ -94,21 +94,15 @@ object Application extends Controller {
 
       msg => {
 
-        val json: JsValue = Json.parse(msg);
-        val feedID = json \ "datastreams" \\ "id";
-        println(feedID);
-        channel push("Pong");
-        val i = 0;
+        val json: JsValue = Json.parse(msg)
+        val feedID = json \ "datastreams" \\ "id"
         for (i <- 0 to (json \ "datastreams" \\ "id").length) {
           println((json \ "datastreams" \\ "id").apply(i).as[String])
-          Await.result(models.Datastreams.insertNewRecord(new Datastream((json \ "feedID").as[String].toInt, (json \ "datastreams" \\ "id").apply(i).as[String], i, (json \ "datastreams" \\ "current_value").apply(i).as[String].toFloat, DateTime.parse((json \ "datastreams" \\ "at").apply(i).as[String]))), 300 millis);
+          Await.result(models.Datastreams.insertNewRecord(new Datastream((json \ "feedID").as[String].toInt, (json \ "datastreams" \\ "id").apply(i).as[String], i, (json \ "datastreams" \\ "current_value").apply(i).as[String].toFloat, DateTime.parse((json \ "datastreams" \\ "at").apply(i).as[String]))), 10 seconds)
 
         }
       }
-        //the channel will push to the Enumerator
-        //models.Datastreams.insertNewRecord(ds)
     }
-    //val out = Enumerator("Pong")
 
     (in,out)
   }
