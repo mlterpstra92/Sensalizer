@@ -15,4 +15,4 @@ GET        /feed/:feedID           controllers.Application.feed(feedID: Int)
 
 # Push data towards database
 
-PUT        /datapush               controllers.Application.datapush
+GET         /datapush               controllers.Application.datapush

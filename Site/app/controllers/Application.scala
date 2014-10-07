@@ -6,7 +6,7 @@ import java.text.SimpleDateFormat
 import com.websudos.phantom.Implicits._
 
 import models.{Datastream, Feed, Feeds, Datastreams}
-import play.api.libs.iteratee.{Iteratee, Concurrent}
+import play.api.libs.iteratee.{Enumerator, Iteratee, Concurrent}
 import org.joda.time.DateTime
 import play.api.libs.json._
 import play.api.mvc._
@@ -91,12 +91,25 @@ object Application extends Controller {
     //log the message to stdout and send response back to client
 
     val (in) = Iteratee.foreach[String] {
-      msg => println(msg)
 
-        val ds: Datastream = new Datastream(1, "asdf", 34.0f, DateTime.now());
+      msg => {
+
+        val json: JsValue = Json.parse(msg);
+        val feedID = json \ "datastreams" \\ "id";
+        println(feedID);
+        channel push("Pong");
+        val i = 0;
+        for (i <- 0 to (json \ "datastreams" \\ "id").length) {
+          println((json \ "feedID").as[String].toInt)
+          Await.result(models.Datastreams.insertNewRecord(new Datastream((json \ "feedID").as[String].toInt, (json \ "datastreams" \\ "id").apply(i).as[String], (json \ "datastreams" \\ "current_value").apply(i).as[String].toFloat, DateTime.parse((json \ "datastreams" \\ "at").apply(i).as[String]))), 10 seconds);
+
+        }
+      }
         //the channel will push to the Enumerator
         //models.Datastreams.insertNewRecord(ds)
     }
+    //val out = Enumerator("Pong")
+
     (in,out)
   }
 }

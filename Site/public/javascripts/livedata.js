@@ -70,9 +70,27 @@ $(document ).ready(function(){
         return Array(n-String(nr).length+1).join(str||'0')+nr;
     }
 
+    JSON.stringify = JSON.stringify || function (obj) {
+        var t = typeof (obj);
+        if (t != "object" || obj === null) {
+            // simple data type
+            if (t == "string") obj = '"'+obj+'"';
+            return String(obj);
+        }
+        else {
+            // recurse array or object
+            var n, v, json = [], arr = (obj && obj.constructor == Array);
+            for (n in obj) {
+                v = obj[n]; t = typeof(v);
+                if (t == "string") v = '"'+v+'"';
+                else if (t == "object" && v !== null) v = JSON.stringify(v);
+                json.push((arr ? "" : '"' + n + '":') + String(v));
+            }
+            return (arr ? "[" : "{") + String(json) + (arr ? "]" : "}");
+        }
+    };
     function isChecked(id){
         var inputID = "check"+id+":checked";
-        console.log($(inputID));
         return true;
         /*console.log($(inputID));
         console.log($(inputID).attr('checked'));
@@ -102,7 +120,6 @@ $(document ).ready(function(){
 
                     $.each(d.datasets, function(idx, dataset){
                         var inputID = "check" + dataset.label;
-                        console.log(inputID);
 
                        $("#graphModForm ul").append("<li><a href=\"#\"><input type=\"checkbox\" id=\"" + inputID + "\" checked><span class=\"lbl\">" + dataset.label + "</span></a></li>");
                         $("#graphModForm ul > li > a").attr('checked', true);
@@ -125,8 +142,8 @@ $(document ).ready(function(){
                         d.datasets[i].pointColor = colors[i];
                         d.datasets[i].strokeColor = colors[i];
                     }
-
-                    var chart = new Chart(ct).Line(d, options);
+                    if (d && d.datasets && d.datasets.length > 0)
+                        var chart = new Chart(ct).Line(d, options);
                     xively.feed.subscribe(feedID, function(event, data){
                         var emptyIndex = d.labels.indexOf("");
                         if (emptyIndex != -1)
@@ -139,8 +156,53 @@ $(document ).ready(function(){
                                 vals.push(data.datastreams[i].current_value);
                         }
 
-                        console.log(vals);
-                        chart.addData(vals, label);
+                        var myData = {
+                            feedID: feedID,
+                            datastreams: data.datastreams
+                        };
+                        myData = JSON.stringify(myData);
+                        if (!chart) {
+                            d.datasets = data.datastreams;
+                            d.labels = [];
+                            d.labels.push(data.updated.split('T' )[1].split('.' )[0]);
+                            for (var i = 0; i < d.datasets.length - 1; ++i)
+                                d.labels.push("");
+                            console.log(d);
+
+                            chart = new Chart(ct).Line(d, options);
+                        }
+                        else
+                            chart.addData(vals, label);
+                        /*$.ajax({
+                            url: 'datapush',
+                            type: 'POST',
+                            data: myData,
+                            contentType: "application/json; charset=utf-8",
+                            dataType: 'json',
+                            success: function(){
+                                console.log("WOOPWOOP");
+                            },
+                            error: function(e){
+                                console.log(e);
+                            }
+                        });*/
+                        var connection = new WebSocket('ws://localhost:9000/datapush', 'json');
+                        // When the connection is open, send some data to the server
+                        connection.onopen = function () {
+                            connection.send(myData); // Send the message 'Ping' to the server
+                        };
+
+                        // Log errors
+                        connection.onerror = function (error) {
+                            console.log('WebSocket Error ' + error);
+                        };
+
+                        // Log messages from the server
+                        connection.onmessage = function (e) {
+                            console.log('Server: ' + e.data);
+                        };
+
+
                         chart.update();
                     });
 
