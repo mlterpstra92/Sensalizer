@@ -13,3 +13,6 @@ GET        /profile/:userID        controllers.Application.profile(userID: Int)
 GET        /feeds/:userID          controllers.Application.feeds(userID: Int)
 GET        /feed/:feedID           controllers.Application.feed(feedID: Int)
 
+# Push data towards database
+
+PUT        /datapush               controllers.Application.datapush

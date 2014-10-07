@@ -27,6 +27,7 @@ object Datastreams extends Datastreams with MyDBConnector {
   // But it's almost always a once per table thing, hopefully bearable.
   // Whatever values you leave out will be inserted as nulls into Cassandra.
   def insertNewRecord(ds: Datastream): Future[ResultSet] = {
+
     insert
       .value(_.feedID, ds.feedID)
       .value(_.streamID, ds.streamID)

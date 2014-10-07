@@ -5,13 +5,15 @@ import java.text.SimpleDateFormat
 
 import com.websudos.phantom.Implicits._
 
-import models.{Feed, Feeds}
+import models.{Datastream, Feed, Feeds, Datastreams}
+import play.api.libs.iteratee.{Iteratee, Concurrent}
 import org.joda.time.DateTime
 import play.api.libs.json._
 import play.api.mvc._
+import play.api.Play.current
 
 import scala.collection.mutable
-import scala.concurrent.{Await, Future}
+import scala.concurrent.{Future, Await}
 import scala.concurrent.duration._
 
 object Application extends Controller {
@@ -39,8 +41,6 @@ object Application extends Controller {
       labels += ds
     }
     labels = labels.distinct
-
-
 
     val jsonObject = Json.toJson(
       Map(
@@ -79,5 +79,24 @@ object Application extends Controller {
     //Await.result(models.Datastreams.createTable, 5000 millis)
     //Await.result(models.Userstates.createTable, 5000 millis)
     Feeds.getList.map(list => Ok(views.html.feeds(list, models.Login.getLoggedInUser(userID).APIKey)))
+
+
+  }
+
+
+  def datapush =  WebSocket.using[String] { request =>
+    //Concurernt.broadcast returns (Enumerator, Concurrent.Channel)
+
+    val (out,channel) = Concurrent.broadcast[String]
+    //log the message to stdout and send response back to client
+
+    val (in) = Iteratee.foreach[String] {
+      msg => println(msg)
+
+        val ds: Datastream = new Datastream(1, "asdf", 34.0f, DateTime.now());
+        //the channel will push to the Enumerator
+        //models.Datastreams.insertNewRecord(ds)
+    }
+    (in,out)
   }
 }
