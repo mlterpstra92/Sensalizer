@@ -87,6 +87,7 @@ $(document ).ready(function(){
                 content: 'json',
                 success: function (d) {
                     d.datasets = d.datasets[0];
+
                     for (var i = 0; i < d.datasets.length; ++i)
                         d.datasets[i] = d.datasets[i][0];
 
@@ -102,6 +103,13 @@ $(document ).ready(function(){
                     for (var i = 0; i < d.datasets.length - 1; ++i)
                         d.labels.push("");
 
+                    //add some colors, maximum of four. Add more if more datasets
+                    var colors = ["rgba(200,0,0,1)","rgba(0,200,0,1)","rgba(0,0,200,1)","rgba(200,200,200,1)"]
+                    for (var i = 0; i < d.datasets.length; ++i) {
+                        d.datasets[i].pointColor = colors[i];
+                        d.datasets[i].strokeColor = colors[i];
+                    }
+
                     var chart = new Chart(ct).Line(d, options);
                     xively.feed.subscribe(feedID, function(event, data){
                         var emptyIndex = d.labels.indexOf("");
@@ -115,6 +123,7 @@ $(document ).ready(function(){
                         chart.addData(vals, label);
                         chart.update();
                     });
+
                 },
                 error: function (xhr, ajaxOptions, thrownError) {
                     alert(xhr.status);
