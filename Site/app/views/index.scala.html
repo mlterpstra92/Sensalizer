@@ -80,6 +80,63 @@
                             <canvas id="feedGraph" width="300" height="300">
                                 Sorry, your browser doesn't support the &lt;canvas&gt; element.
                             </canvas>
+                            <form id="graphModForm" class="form-inline" role="form">
+                                <div class="form-group">
+                                    <div>
+                                        <label>Number of datapoints</label>
+                                        <input type="number" class="form-control" id="numDataPoints" placeholder="10">
+                                    </div>
+                                </div>
+                                <div class="input-group">
+                                    <div class="input-group-btn">
+                                        <button tabindex="-1" class="btn btn-default" type="button">Active data</button>
+                                        <button tabindex="-1" data-toggle="dropdown" class="btn btn-default dropdown-toggle" type="button">
+                                            <span class="caret"></span>
+                                        </button>
+                                        <ul role="menu" class="dropdown-menu">
+                                            <li><a href="#">
+                                                <input type="checkbox" checked><span class="lbl"> All</span>
+                                            </a></li>
+                                            <li class="divider"></li>
+                                            <!--<li><a href="#">
+                                                <input type="checkbox">
+                                                <span class="lbl"> Monday</span>
+                                            </a></li>
+                                            <li><a href="#">
+                                                <input type="checkbox"><span class="lbl">
+                                                Tuesday</span>
+                                            </a></li>
+                                            <li><a href="#">
+                                                <input type="checkbox"><span class="lbl">
+                                                Wednesday</span>
+                                            </a></li>
+                                            <li><a href="#">
+                                                <input type="checkbox"><span class="lbl">
+                                                Thursday</span>
+                                            </a></li>
+                                            <li><a href="#">
+                                                <input type="checkbox"><span class="lbl">
+                                                Friday</span>
+                                            </a></li>
+                                            <li><a href="#">
+                                                <input type="checkbox"><span class="lbl">
+                                                Saturday</span>
+                                            </a></li>
+                                            <li><a href="#">
+                                                <input type="checkbox"><span class="lbl">
+                                                Sunday</span>
+                                            </a></li>-->
+                                        </ul>
+                                    </div>
+                                </div>
+                                <div class="checkbox">
+                                    <label>
+                                        <input type="checkbox" checked value="">
+                                        Live data
+                                    </label>
+                                </div>
+                            </form>
+
                         </div>
                     </div> <!-- /row -->
                 </div>

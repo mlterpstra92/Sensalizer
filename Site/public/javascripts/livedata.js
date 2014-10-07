@@ -1,5 +1,5 @@
 $(document ).ready(function(){
-
+    $("#graphModForm").hide();
     var data = {
         labels: ["January", "February", "March", "April", "May", "June", "July"],
         datasets:
@@ -70,6 +70,14 @@ $(document ).ready(function(){
         return Array(n-String(nr).length+1).join(str||'0')+nr;
     }
 
+    function isChecked(id){
+        var inputID = "check"+id+":checked";
+        console.log($(inputID));
+        return true;
+        /*console.log($(inputID));
+        console.log($(inputID).attr('checked'));
+        return $(inputID).val();*/
+    }
     //Apparently, we eat click events, so use event delegation
     $(this ).on('click', 'button', function(e){
         e.preventDefault();
@@ -86,11 +94,19 @@ $(document ).ready(function(){
                 method: 'GET',
                 content: 'json',
                 success: function (d) {
+                    $("#graphModForm").show();
                     d.datasets = d.datasets[0];
 
                     for (var i = 0; i < d.datasets.length; ++i)
                         d.datasets[i] = d.datasets[i][0];
 
+                    $.each(d.datasets, function(idx, dataset){
+                        var inputID = "check" + dataset.label;
+                        console.log(inputID);
+
+                       $("#graphModForm ul").append("<li><a href=\"#\"><input type=\"checkbox\" id=\"" + inputID + "\" checked><span class=\"lbl\">" + dataset.label + "</span></a></li>");
+                        $("#graphModForm ul > li > a").attr('checked', true);
+                    });
                     var now = new Date();
                     now.setSeconds(now.getSeconds() - 4);
                     var hours, minutes, seconds;
@@ -118,8 +134,12 @@ $(document ).ready(function(){
                         var label = data.updated.split('T' )[1].split('.' )[0];
                         var vals = [];
                         for (var i = 0; i < data.datastreams.length; ++i)
-                            vals.push(data.datastreams[i].current_value);
+                        {
+                            if (isChecked(data.datastreams[i].id))
+                                vals.push(data.datastreams[i].current_value);
+                        }
 
+                        console.log(vals);
                         chart.addData(vals, label);
                         chart.update();
                     });
