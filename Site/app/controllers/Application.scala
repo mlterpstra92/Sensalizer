@@ -2,8 +2,8 @@ package controllers
 
 
 import com.websudos.phantom.Implicits._
+
 import models.{Feed, Feeds}
-import play.api.libs.EventSource
 import play.api.libs.json._
 import play.api.mvc._
 
@@ -62,27 +62,17 @@ object Application extends Controller {
     Json.stringify(jsonObject)
   }
 
-  def feed(feedID: Int) = Action {
-    val fFeed: Future[Seq[String]] = models.Datastreams.getDatastreamIDs(feedID)
-    Async {
-      fFeed.map(res => Ok(createJsonFromDatastreams(feedID, res)).as("application/json"))
-    }
-}
+  def feed(feedID: Int) = Action.async {
+    models.Datastreams.getDatastreamIDs(feedID).map(res => Ok(createJsonFromDatastreams(feedID, res)).as("application/json"))
+  }
 
 
 
-  def feeds(userID: Int) = Action{
+  def feeds(userID: Int) = Action.async {
     //Create tables
     //Await.result(models.Feeds.createTable, 5000 millis)
     //Await.result(models.Datastreams.createTable, 5000 millis)
     //Await.result(models.Userstates.createTable, 5000 millis)
-    if (models.Authorization.isAuthorized(0)) {
-      val fList: Future[Seq[Feed]] = Feeds.getList
-      Async {
-        fList.map{list => Ok(views.html.feeds(list, models.Login.getLoggedInUser(userID).APIKey))}
-      }
-    }
-    else
-      Unauthorized(views.html.unauthorized())
+    Feeds.getList.map(list => Ok(views.html.feeds(list, models.Login.getLoggedInUser(userID).APIKey)))
   }
 }
