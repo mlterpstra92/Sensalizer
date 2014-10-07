@@ -76,7 +76,7 @@ object Application extends Controller {
   def feeds(userID: Int) = Action.async {
     //Create tables
     //Await.result(models.Feeds.createTable, 5000 millis)
-    Await.result(models.Datastreams.createTable, 5000 millis)
+    //Await.result(models.Datastreams.createTable, 5000 millis)
     //Await.result(models.Userstates.createTable, 5000 millis)
     Feeds.getList.map(list => Ok(views.html.feeds(list, models.Login.getLoggedInUser(userID).APIKey)))
 
