@@ -24,7 +24,7 @@ object MyDBConnector {
   val keySpace = "sensalizer"
 
   lazy val cluster =  Cluster.builder()
-    .addContactPoint("54.76.29.54")
+    .addContactPoint("54.76.27.10")
     .withPort(9042)
     .withoutJMXReporting()
     .withoutMetrics()

@@ -76,7 +76,7 @@ object Application extends Controller {
   def feeds(userID: Int) = Action.async {
     //Create tables
     //Await.result(models.Feeds.createTable, 5000 millis)
-    //Await.result(models.Datastreams.createTable, 5000 millis)
+    Await.result(models.Datastreams.createTable, 5000 millis)
     //Await.result(models.Userstates.createTable, 5000 millis)
     Feeds.getList.map(list => Ok(views.html.feeds(list, models.Login.getLoggedInUser(userID).APIKey)))
 
@@ -98,7 +98,7 @@ object Application extends Controller {
         val feedID = json \ "datastreams" \\ "id"
         for (i <- 0 to (json \ "datastreams" \\ "id").length) {
           println((json \ "datastreams" \\ "id").apply(i).as[String])
-          Await.result(models.Datastreams.insertNewRecord(new Datastream((json \ "feedID").as[String].toInt, (json \ "datastreams" \\ "id").apply(i).as[String], i, (json \ "datastreams" \\ "current_value").apply(i).as[String].toFloat, DateTime.parse((json \ "datastreams" \\ "at").apply(i).as[String]))), 10 seconds)
+          Await.result(models.Datastreams.insertNewRecord(new Datastream((json \ "feedID").as[String].toInt, (json \ "datastreams" \\ "id").apply(i).as[String], (json \ "datastreams" \\ "current_value").apply(i).as[String].toFloat, DateTime.parse((json \ "datastreams" \\ "at").apply(i).as[String]))), 10 seconds)
 
         }
       }
