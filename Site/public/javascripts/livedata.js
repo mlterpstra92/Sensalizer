@@ -36,15 +36,14 @@ $(document ).ready(function(){
     $(window).resize(respondCanvas);
     var steps = 3;
     var max = 100;
-    var options = {
+    /*var options = {
         responsive : true,
         animation: false,
         barValueSpacing : 5,
         barDatasetSpacing : 1,
-        showTooltips: true,
-        label: {format: 'shortTime'}
+        showTooltips: true
 
-        /*animation : false,
+        animation : false,
          responsive : true/*,
          animationEasing: 'easeOutQuart',
          animationSteps: 500,
@@ -53,8 +52,8 @@ $(document ).ready(function(){
          scaleOverride: true,
          scaleSteps: steps,
          scaleStepWidth: Math.ceil(max / steps),
-         scaleStartValue: 0*/
-    };
+         scaleStartValue: 0
+    };*/
 
     var chart;
     function respondCanvas() {
@@ -147,12 +146,45 @@ $(document ).ready(function(){
                         d.datasets[i].pointColor = colors[i];
                         d.datasets[i].strokeColor = colors[i];
                     }
+
+                    //legend!
+                    var options = {
+                        responsive : true,
+                        animation: false,
+                        barValueSpacing : 5,
+                        barDatasetSpacing : 1,
+                        showTooltips: true,
+                        label: {format: 'shortTime'},
+                        legendTemplate : '<ul id="legend">'
+                            +'<% for (var i=0; i<datasets.length; i++) { %>'
+                            +'<li id=\"li<%=i%>\">'
+                            +'<% if (datasets[i].label) { %><%= datasets[i].label %><% } %>'
+                            +'</li>'
+                            +'<% } %>'
+                            +'</ul>'
+                    }
+
                     var chart = new Chart(ct).Line(d, options);
+                    var legend = chart.generateLegend();
+                    document.getElementById('legend').innerHTML = legend;
+
+                    document.styleSheets[0].addRule('#legend','list-style: none', 'padding:0', 'margin:0');
+                    for (var i = 0; i < d.datasets.length; ++i) {
+                        document.styleSheets[0].addRule('#li'+i, 'display: inline');
+                        document.styleSheets[0].addRule('#li'+i+':before','content: "▪"; ' +
+                            'color: '+colors[i]+';'+
+                            'display: inline;' +
+                            'vertical-align: middle;' +
+                            'position: relative;' +
+                            'font-size: 3em;' +
+                            'padding-right: 10px');
+                    }
+
                     xively.feed.subscribe(feedID, function(event, data){
                         var emptyIndex = d.labels.indexOf("");
                         if (emptyIndex != -1)
                             d.labels.splice(emptyIndex, 1);
-                        //var label = data.updated.split('T' )[1].split('.' )[0];
+                        var label = data.updated.split('T' )[1].split('.' )[0];
                         var vals = [];
                         for (var i = 0; i < data.datastreams.length; ++i)
                         {
