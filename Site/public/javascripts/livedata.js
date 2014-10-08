@@ -41,7 +41,8 @@ $(document ).ready(function(){
         animation: false,
         barValueSpacing : 5,
         barDatasetSpacing : 1,
-        showTooltips: true
+        showTooltips: true,
+        label: {format: 'shortTime'}
 
         /*animation : false,
          responsive : true/*,
@@ -151,7 +152,7 @@ $(document ).ready(function(){
                         var emptyIndex = d.labels.indexOf("");
                         if (emptyIndex != -1)
                             d.labels.splice(emptyIndex, 1);
-                        var label = data.updated.split('T' )[1].split('.' )[0];
+                        //var label = data.updated.split('T' )[1].split('.' )[0];
                         var vals = [];
                         for (var i = 0; i < data.datastreams.length; ++i)
                         {
@@ -167,15 +168,26 @@ $(document ).ready(function(){
                         if (!chart) {
                             d.datasets = data.datastreams;
                             d.labels = [];
-                            d.labels.push(data.updated.split('T' )[1].split('.' )[0]);
+                            var date = new Date(Date.parse(data.updated));
+                            console.log(date.getTimezoneOffset());
+                            date.setHours(date.getHours() + date.getTimezoneOffset());
+                            d.labels.push(date.toLocaleTimeString());
+
+                            d.labels.push(date);
                             for (var i = 0; i < d.datasets.length - 1; ++i)
                                 d.labels.push("");
                             console.log(d);
 
                             chart = new Chart(ct).Line(d, options);
                         }
-                        else
-                            chart.addData(vals, label);
+                        else {
+                            var format = "HH:mm:ss";
+                            if ($("#liveData").prop('checked'))
+                            {
+                                var date = new Date(Date.parse(data.updated));
+                                chart.addData(vals, date.toLocaleTimeString());
+                            }
+                        }
                         /*$.ajax({
                          url: 'datapush',
                          type: 'POST',
