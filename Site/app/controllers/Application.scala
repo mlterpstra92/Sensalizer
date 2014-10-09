@@ -126,7 +126,7 @@ object Application extends Controller {
             feedIDStr = feedID.apply(0);
             Await.result(models.Datastreams.getDatastreamIDs(feedID.apply(0).toInt), 2 seconds).distinct.map(label => {
               Await.result(models.Datastreams.getDataValueByStreamID(feedID.apply(0).toInt, label), 1500 millis).map(value => {
-                channel.basicPublish("", QUEUE_NAME, null, createJson(label, value).getBytes());
+                channel.basicPublish("", QUEUE_NAME, null, createJson(label, value).getBytes);
               })
             })
         }
@@ -134,20 +134,19 @@ object Application extends Controller {
     }
 
     println("Pushed db messages")
-    val mqtt = getMQTT(feedIDStr, apiKeyStr)
+    implicit val mqtt = getMQTT(feedIDStr, apiKeyStr)
     println(mqtt)
-    val conn = mqtt.blockingConnection()
-    println("got connection")
-    conn.connect()
-    println("here")
-    conn.subscribe(Array(new Topic("/v2/feeds/"+feedIDStr, QoS.AT_LEAST_ONCE)))
-    println("Got topic")
-    while(true) {
-      val message = conn.receive()
-      println(new String(message.getPayload))
-      message.ack()
-    }
-    conn.disconnect()
+    withIt(conn => {
+      println("got connection")
+      conn.subscribe(Array(new Topic("/v2/feeds/" + feedIDStr, QoS.AT_LEAST_ONCE)))
+      println("Got topic")
+      while (true) {
+        val message = conn.receive()
+        val msg = (new String(message.getPayload))
+        message.ack()
+        val json: JsValue = Json.parse(msg)
+      }
+    });
 
     Ok("");
   }
