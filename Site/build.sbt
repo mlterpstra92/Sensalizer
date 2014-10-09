@@ -14,7 +14,9 @@ libraryDependencies ++= Seq(
   "com.websudos"  %% "phantom-spark"                 % phantomVersion,
   //"com.websudos"  %% "phantom-test"                  % phantomVersion,
   //"com.websudos"  %% "phantom-testing"               % phantomVersion,
-  "com.websudos"  %% "phantom-udt"                   % phantomVersion
+  "com.websudos"  %% "phantom-udt"                   % phantomVersion,
+  "com.github.sstone" %% "amqp-client" % "1.4",
+  "org.fusesource.mqtt-client" % "mqtt-client" % "1.5"
 )
 
 //libraryDependencies += "ws.securesocial" %% "securesocial" % "2.1.4"

@@ -1,22 +1,38 @@
 package controllers
 
-import com.websudos.phantom.Implicits._
+import java.io.{BufferedReader, InputStreamReader, PrintWriter}
+import java.net.{InetAddress, Socket}
+import com.rabbitmq.client.{QueueingConsumer, ConnectionFactory, Connection, Channel}
+import play.api.data._
+import play.api.data.Forms._
+import org.fusesource.mqtt.client.{Topic, BlockingConnection, MQTT, QoS}
 
+import com.websudos.phantom.Implicits._
 import models.{Datastream, Feed, Feeds, Datastreams}
 import play.api.libs.iteratee.{Enumerator, Iteratee, Concurrent}
 import org.joda.time.DateTime
 import play.api.libs.json._
 import play.api.mvc._
+import views.html.helper.form
 
 import scala.collection.mutable
 import scala.concurrent.{Future, Await}
 import scala.concurrent.duration._
-
-
+import scala.io.BufferedSource
 
 
 object Application extends Controller {
-  val queue: mutable.PriorityQueue[Datastream] = new mutable.PriorityQueue[Datastream]();
+  val QUEUE_NAME = "Sensalizer"
+
+  val factory: ConnectionFactory = new ConnectionFactory();
+  factory.setHost("54.171.103.214");
+  val connection: Connection = factory.newConnection();
+  val channel: Channel = connection.createChannel();
+
+
+  val consumer: QueueingConsumer = new QueueingConsumer(channel);
+  channel.basicConsume(QUEUE_NAME, true, consumer);
+
 
   def index = Action {
     if (models.Login.getLoggedInUser(0) != null)
@@ -67,8 +83,79 @@ object Application extends Controller {
     Json.stringify(jsonObject)
   }
 
+  def createJson(label: String, value: Float): String = {
+    return Json.stringify(Json.toJson(
+      Map(
+        "label" -> Json.toJson(label),
+        "currentValue" -> Json.toJson(value)
+      )
+    ))
+  }
+
+  def getMQTT(feedID: String, apiKey: String): MQTT = {
+    val mqtt = new MQTT()
+
+    mqtt.setHost("api.xively.com", 1883)
+    mqtt.setUserName(apiKey)
+    mqtt.setCleanSession(false)
+    mqtt.setClientId(java.util.UUID.randomUUID().toString())
+    mqtt
+  }
+
+
+  def withIt(f: BlockingConnection => Unit)(implicit mqtt: MQTT) {
+    val connection = mqtt.blockingConnection()
+    connection.connect()
+
+    f(connection)
+
+    connection.disconnect()
+  }
+
+
+  def triggerFeed = Action { request =>
+    var feedIDStr: String = null;
+    var apiKeyStr: String = null;
+    val data = request.body.asFormUrlEncoded match{
+      case Some(map) =>
+        map.get("apikey") match{
+          case Some(apikey) => apiKeyStr = apikey.apply(0);
+        }
+        map.get("feedid") match{
+          case Some(feedID) =>
+            feedIDStr = feedID.apply(0);
+            Await.result(models.Datastreams.getDatastreamIDs(feedID.apply(0).toInt), 2 seconds).distinct.map(label => {
+              Await.result(models.Datastreams.getDataValueByStreamID(feedID.apply(0).toInt, label), 1500 millis).map(value => {
+                channel.basicPublish("", QUEUE_NAME, null, createJson(label, value).getBytes());
+              })
+            })
+        }
+      case None => Application.Status(418);
+    }
+
+    println("Pushed db messages")
+    val mqtt = getMQTT(feedIDStr, apiKeyStr)
+    println(mqtt)
+    val conn = mqtt.blockingConnection()
+    println("got connection")
+    conn.connect()
+    println("here")
+    conn.subscribe(Array(new Topic("/v2/feeds/"+feedIDStr, QoS.AT_LEAST_ONCE)))
+    println("Got topic")
+    while(true) {
+      val message = conn.receive()
+      println(new String(message.getPayload))
+      message.ack()
+    }
+    conn.disconnect()
+
+    Ok("");
+  }
+
   def feed(feedID: Int) = Action.async {
-    models.Datastreams.getDatastreamIDs(feedID).map(res => Ok(createJsonFromDatastreams(feedID, res)).as("application/json"))
+    models.Datastreams.getDatastreamIDs(feedID).map(res =>
+      Ok(createJsonFromDatastreams(feedID, res)).as("application/json")
+    )
   }
 
 
@@ -82,13 +169,6 @@ object Application extends Controller {
 
 
   }
-
-  /*while(true) {
-    if (!queue.isEmpty) {
-      val item = queue.dequeue()
-      Await.result(models.Datastreams.insertNewRecord(item), 10 seconds);
-    }
-  }*/
 
   def datapush =  WebSocket.using[String] { request =>
     //Concurernt.broadcast returns (Enumerator, Concurrent.Channel)
@@ -104,8 +184,8 @@ object Application extends Controller {
         val feedID = json \ "datastreams" \\ "id"
         for (i <- 0 to (json \ "datastreams" \\ "id").length) {
           println((json \ "datastreams" \\ "id").apply(i).as[String])
-          queue.enqueue(new Datastream((json \ "feedID").as[String].toInt, (json \ "datastreams" \\ "id").apply(i).as[String], (json \ "datastreams" \\ "current_value").apply(i).as[String].toFloat, DateTime.parse((json \ "datastreams" \\ "at").apply(i).as[String])));
-          println(queue);
+          //queue.enqueue(new Datastream((json \ "feedID").as[String].toInt, (json \ "datastreams" \\ "id").apply(i).as[String], (json \ "datastreams" \\ "current_value").apply(i).as[String].toFloat, DateTime.parse((json \ "datastreams" \\ "at").apply(i).as[String])));
+          //println(queue);
         }
       }
     }

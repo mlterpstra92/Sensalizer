@@ -12,7 +12,8 @@ GET        /assets/*file           controllers.Assets.at(path="/public", file)
 GET        /profile/:userID        controllers.Application.profile(userID: Int)
 GET        /feeds/:userID          controllers.Application.feeds(userID: Int)
 GET        /feed/:feedID           controllers.Application.feed(feedID: Int)
+POST       /triggerFeed            controllers.Application.triggerFeed
 
 # Push data towards database
 
-GET         /datapush               controllers.Application.datapush
+GET        /datapush               controllers.Application.datapush
