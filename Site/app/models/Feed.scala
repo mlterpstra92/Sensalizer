@@ -7,6 +7,7 @@ import com.twitter.conversions.time._
 import scala.concurrent.{ Future => ScalaFuture }
 import com.datastax.driver.core.{ResultSet,Row}
 import com.websudos.phantom.Implicits._
+import play.api.libs.json._
 
 
 case class Datastream(

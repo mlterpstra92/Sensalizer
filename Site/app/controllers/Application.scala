@@ -1,10 +1,6 @@
 package controllers
 
-import java.io.{BufferedReader, InputStreamReader, PrintWriter}
-import java.net.{InetAddress, Socket}
 import com.rabbitmq.client.{QueueingConsumer, ConnectionFactory, Connection, Channel}
-import play.api.data._
-import play.api.data.Forms._
 import org.fusesource.mqtt.client.{Topic, BlockingConnection, MQTT, QoS}
 
 import com.websudos.phantom.Implicits._
@@ -13,12 +9,10 @@ import play.api.libs.iteratee.{Enumerator, Iteratee, Concurrent}
 import org.joda.time.DateTime
 import play.api.libs.json._
 import play.api.mvc._
-import views.html.helper.form
 
 import scala.collection.mutable
 import scala.concurrent.{Future, Await}
 import scala.concurrent.duration._
-import scala.io.BufferedSource
 
 
 object Application extends Controller {
@@ -26,7 +20,7 @@ object Application extends Controller {
 
   val factory: ConnectionFactory = new ConnectionFactory();
   factory.setHost("54.171.103.214");
-  val connection: Connection = factory.newConnection();
+  val connection: Connection = factory.newConnection()
   val channel: Channel = connection.createChannel();
 
 
@@ -84,7 +78,7 @@ object Application extends Controller {
   }
 
   def createJson(label: String, value: Float): String = {
-    return Json.stringify(Json.toJson(
+    Json.stringify(Json.toJson(
       Map(
         "label" -> Json.toJson(label),
         "currentValue" -> Json.toJson(value)
@@ -98,7 +92,7 @@ object Application extends Controller {
     mqtt.setHost("api.xively.com", 1883)
     mqtt.setUserName(apiKey)
     mqtt.setCleanSession(false)
-    mqtt.setClientId(java.util.UUID.randomUUID().toString())
+    mqtt.setClientId(java.util.UUID.randomUUID().toString)
     mqtt
   }
 
@@ -114,8 +108,8 @@ object Application extends Controller {
 
 
   def triggerFeed = Action { request =>
-    var feedIDStr: String = null;
-    var apiKeyStr: String = null;
+    var feedIDStr: String = null
+    var apiKeyStr: String = null
     val data = request.body.asFormUrlEncoded match{
       case Some(map) =>
         map.get("apikey") match{
@@ -123,7 +117,7 @@ object Application extends Controller {
         }
         map.get("feedid") match{
           case Some(feedID) =>
-            feedIDStr = feedID.apply(0);
+            feedIDStr = feedID.apply(0)
             Await.result(models.Datastreams.getDatastreamIDs(feedID.apply(0).toInt), 2 seconds).distinct.map(label => {
               Await.result(models.Datastreams.getDataValueByStreamID(feedID.apply(0).toInt, label), 1500 millis).map(value => {
                 channel.basicPublish("", QUEUE_NAME, null, createJson(label, value).getBytes);
@@ -142,11 +136,27 @@ object Application extends Controller {
       println("Got topic")
       while (true) {
         val message = conn.receive()
-        val msg = (new String(message.getPayload))
+        val msg = new String(message.getPayload)
         message.ack()
         val json: JsValue = Json.parse(msg)
+        val label = DateTime.parse((json \ "updated").as[String])
+        for (i <- 0 to (json \ "datastreams" \\ "id").length - 1) {
+          val streamid = (json \ "datastreams" \\ "id").apply(i).as[String]
+          val currentValue = (json \ "datastreams" \\ "current_value").apply(i).as[String].toFloat
+          val newJson = Json.stringify(Json.toJson(
+            Map(
+              "label" -> Json.toJson(label),
+              "feedID" -> Json.toJson(feedIDStr),
+              "streamid" -> Json.toJson(streamid),
+              "current_value" -> Json.toJson(currentValue)
+            )
+          ))
+          models.Datastreams.insertNewRecord(new Datastream(feedIDStr.toInt, streamid, currentValue, label))
+
+          channel.basicPublish("", QUEUE_NAME, null, newJson.getBytes)
+        }
       }
-    });
+    })
 
     Ok("");
   }
