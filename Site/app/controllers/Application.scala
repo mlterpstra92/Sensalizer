@@ -16,17 +16,12 @@ import scala.concurrent.duration._
 
 
 object Application extends Controller {
-  val QUEUE_NAME = "Sensalizer"
+  val QUEUE_NAME = "sensalizer"
 
   val factory: ConnectionFactory = new ConnectionFactory();
-  factory.setHost("54.171.103.214");
+  factory.setHost("54.171.108.54");
   val connection: Connection = factory.newConnection()
   val channel: Channel = connection.createChannel();
-
-
-  val consumer: QueueingConsumer = new QueueingConsumer(channel);
-  channel.basicConsume(QUEUE_NAME, true, consumer);
-
 
   def index = Action {
     if (models.Login.getLoggedInUser(0) != null)

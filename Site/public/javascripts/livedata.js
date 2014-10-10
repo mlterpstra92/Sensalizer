@@ -65,14 +65,57 @@ $(document ).ready(function() {
             var feedID = $(this).parent().parent().find('td')[0].innerHTML.trim();
             var apiKey = $(this).parent().parent().find('td')[3].innerHTML.trim();
 
-            var url = "triggerFeed";
             $.ajax({
                 type: "POST",
-                url: url,
+                url: "triggerFeed",
                 data: {feedid: feedID, apikey: apiKey},
                 success: success
             });
-            console.log("OK");
+            // Use SockJS
+            Stomp.WebSocketClass = SockJS;
+
+            var RabbitMQIP = "54.171.108.54"
+            var username = "guest",
+                password = "guest",
+                vhost    = "/",
+                url      = 'http://' + RabbitMQIP + ':15674/stomp',
+                queue    = "/topic/sensalizer.#"; // To translate mqtt topics to
+            // stomp we change slashes
+            // to dots
+            var console;
+
+            function on_connect() {
+                console += 'Connected to RabbitMQ-Web-Stomp<br />';
+                console.log(client);
+                client.subscribe(queue, on_message);
+            }
+
+            function on_connection_error() {
+                console.innerHTML += 'Connection failed!<br />';
+            }
+
+            function on_message(m) {
+                console.log('Received:' + m);
+                output.innerHTML += m.body + '<br />';
+            }
+
+            var ws = new SockJS(url);
+            var client = Stomp.over(ws);
+            client.heartbeat.outgoing = 0;
+            client.heartbeat.incoming = 0;
+
+            window.onload = function () {
+                console = document.getElementById("console");
+                // Connect
+                client.connect(
+                    username,
+                    password,
+                    on_connect,
+                    on_connection_error,
+                    vhost
+                );
+            }
+
             function success(){
                 console.log("cool");
             }
