@@ -69,56 +69,43 @@ $(document ).ready(function() {
                 type: "POST",
                 url: "triggerFeed",
                 data: {feedid: feedID, apikey: apiKey},
-                success: success
+                success: function(a){
+                    console.log("cool");
+                    console.log(a);
+                }
             });
-            // Use SockJS
-            Stomp.WebSocketClass = SockJS;
-
-            var RabbitMQIP = "54.171.108.54"
-            var username = "guest",
-                password = "guest",
-                vhost    = "/",
-                url      = 'http://' + RabbitMQIP + ':15674/stomp',
-                queue    = "/topic/sensalizer.#"; // To translate mqtt topics to
-            // stomp we change slashes
-            // to dots
-            var console;
-
-            function on_connect() {
-                console += 'Connected to RabbitMQ-Web-Stomp<br />';
-                console.log(client);
-                client.subscribe(queue, on_message);
-            }
-
-            function on_connection_error() {
-                console.innerHTML += 'Connection failed!<br />';
-            }
-
-            function on_message(m) {
-                console.log('Received:' + m);
-                output.innerHTML += m.body + '<br />';
-            }
-
-            var ws = new SockJS(url);
+            var RabbitMQIP = "54.171.108.54";
+            var ws = new SockJS('http://' + RabbitMQIP + ':15674/stomp');
             var client = Stomp.over(ws);
-            client.heartbeat.outgoing = 0;
+            // SockJS does not support heart-beat: disable heart-beats
             client.heartbeat.incoming = 0;
+            client.heartbeat.outgoing = 0;
 
-            window.onload = function () {
-                console = document.getElementById("console");
-                // Connect
-                client.connect(
-                    username,
-                    password,
-                    on_connect,
-                    on_connection_error,
-                    vhost
-                );
-            }
+            var first = true;
+            var chart = null;
 
-            function success(){
-                console.log("cool");
-            }
+            var on_connect = function(x) {
+                id = client.subscribe("/queue/sensalizer", function(m) {
+                    // reply by sending the reversed text to the temp queue defined in the "reply-to" header
+                   // console.log("SUCCESS!");
+                    console.log(m.body);
+                    var data = JSON.parse(m.body);
+                    if (first) {
+                        chart = new Chart(ct).Line(data, options);
+                        first = false
+                    }
+                    else
+                    {
+                        console.log(data.label);
+                        chart.addData(data.currentValue, data.label);
+                        chart.update();
+                    }
+                });
+            };
+            var on_error =  function() {
+                console.log('error');
+            };
+            client.connect('guest', 'guest', on_connect, on_error, '/');
         }
     });
 });

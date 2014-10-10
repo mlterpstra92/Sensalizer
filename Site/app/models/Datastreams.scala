@@ -58,6 +58,9 @@ object Datastreams extends Datastreams with MyDBConnector {
     select(_.insertionTime).where(_.feedID eqs feedID).one()
   }
 
+  def getInsertionTimes(feedID: Int): Future[Seq[DateTime]] = {
+    select(_.insertionTime).where(_.feedID eqs feedID).fetch
+  }
 
 
   /*
