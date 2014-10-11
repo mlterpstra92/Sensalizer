@@ -1,8 +1,5 @@
 language: scala
 scala:
   - 2.11.2
-env:
-  global:
-    - CI_HOME=`pwd`/Site
-script: sbt test
+script: cd Site && sbt test
 
