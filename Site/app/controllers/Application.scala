@@ -1,8 +1,5 @@
 package controllers
 
-
-import java.text.SimpleDateFormat
-
 import com.websudos.phantom.Implicits._
 
 import models.{Datastream, Feed, Feeds, Datastreams}
@@ -10,13 +7,16 @@ import play.api.libs.iteratee.{Enumerator, Iteratee, Concurrent}
 import org.joda.time.DateTime
 import play.api.libs.json._
 import play.api.mvc._
-import play.api.Play.current
 
 import scala.collection.mutable
 import scala.concurrent.{Future, Await}
 import scala.concurrent.duration._
 
+
+
+
 object Application extends Controller {
+  val queue: mutable.PriorityQueue[Datastream] = new mutable.PriorityQueue[Datastream]();
 
   def index = Action {
     if (models.Login.getLoggedInUser(0) != null)
@@ -83,6 +83,12 @@ object Application extends Controller {
 
   }
 
+  /*while(true) {
+    if (!queue.isEmpty) {
+      val item = queue.dequeue()
+      Await.result(models.Datastreams.insertNewRecord(item), 10 seconds);
+    }
+  }*/
 
   def datapush =  WebSocket.using[String] { request =>
     //Concurernt.broadcast returns (Enumerator, Concurrent.Channel)
@@ -98,8 +104,8 @@ object Application extends Controller {
         val feedID = json \ "datastreams" \\ "id"
         for (i <- 0 to (json \ "datastreams" \\ "id").length) {
           println((json \ "datastreams" \\ "id").apply(i).as[String])
-          Await.result(models.Datastreams.insertNewRecord(new Datastream((json \ "feedID").as[String].toInt, (json \ "datastreams" \\ "id").apply(i).as[String], i, (json \ "datastreams" \\ "current_value").apply(i).as[String].toFloat, DateTime.parse((json \ "datastreams" \\ "at").apply(i).as[String]))), 10 seconds)
-
+          queue.enqueue(new Datastream((json \ "feedID").as[String].toInt, (json \ "datastreams" \\ "id").apply(i).as[String], (json \ "datastreams" \\ "current_value").apply(i).as[String].toFloat, DateTime.parse((json \ "datastreams" \\ "at").apply(i).as[String])));
+          println(queue);
         }
       }
     }
