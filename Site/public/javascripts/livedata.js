@@ -165,8 +165,9 @@ $(document ).ready(function(){
                     }
 
                     var chart = new Chart(ct).Line(d, options);
-                    var legend = chart.generateLegend();
-                    document.getElementById('legend').innerHTML = legend;
+                    var legendHTML = document.getElementById("legend");
+                    if (legendHTML)
+                        legendHTML.innerHTML = chart.generateLegend();
 
                     document.styleSheets[0].addRule('#legend','list-style: none', 'padding:0', 'margin:0');
                     for (var i = 0; i < d.datasets.length; ++i) {
