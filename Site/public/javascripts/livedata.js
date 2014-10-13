@@ -56,6 +56,35 @@ $(document ).ready(function() {
             return (arr ? "[" : "{") + String(json) + (arr ? "]" : "}");
         }
     };
+    var getSortedIndex = function (arr) {
+        var index = [];
+        for (var i = 0; i < arr.length; i++) {
+            index.push(i);
+        }
+        index = index.sort((function(arr){
+            /* this will sort ints in descending order, change it based on your needs */
+            return function (a, b) {return ((arr[a] > arr[b]) ? 1 : ((arr[a] < arr[b]) ? -1 : 0));
+            };
+        })(arr));
+        return index;
+    };
+    var sortMultipleArrays = function (sort, followers) {
+        var index = getSortedIndex(sort)
+            , followed = [];
+        followers.unshift(sort);
+        followers.forEach(function(arr){
+            var _arr = [];
+            for(var i = 0; i < arr.length; i++)
+                _arr[i] = arr[index[i]];
+            followed.push(_arr);
+        });
+        var result =  {sorted: followed[0]};
+        followed.shift();
+        result.followed = followed;
+        return result;
+    };
+
+
 
     //Apparently, we eat click events, so use event delegation
     $(this).on('click', 'button', function (e) {
@@ -71,7 +100,6 @@ $(document ).ready(function() {
                 data: {feedid: feedID, apikey: apiKey},
                 success: function(a){
                     console.log("cool");
-                    console.log(a);
                 }
             });
             var RabbitMQIP = "54.171.108.54";
@@ -87,19 +115,45 @@ $(document ).ready(function() {
             var on_connect = function(x) {
                 id = client.subscribe("/queue/sensalizer", function(m) {
                     // reply by sending the reversed text to the temp queue defined in the "reply-to" header
-                   // console.log("SUCCESS!");
-                    console.log(m.body);
+                    // console.log("SUCCESS!");
                     var data = JSON.parse(m.body);
                     if (first) {
+                        console.log(data);
+                        if (data && data.datasets) {
+                            var followers = [];
+                            for (var j in data.datasets) {
+                                for (var q in data.datasets[j])
+                                    followers.push(data.datasets[j][q].data)
+                            }
+                            //console.log(followers)
+
+                            var res = sortMultipleArrays(data.labels, followers);
+                            //console.log(res);
+                            data.labels = res.sorted;
+                            var order = data.labels;
+                            for (var z = 0; z < res.followed.length; ++z) {
+                                data.datasets[0][z] = res.followed[z];
+                            }
+                        }
+
+
+                        if (data && data.labels) {
+                            for (var i in data.labels)
+                                data.labels[i] = new Date(data.labels[i]).toTimeString().split(' ')[0];
+                        }
+                        data.datasets = data.datasets[0];
+                        console.log(data);
                         chart = new Chart(ct).Line(data, options);
                         first = false
                     }
                     else
                     {
-                        console.log(data.label);
-                        chart.addData(data.currentValue, data.label);
-                        chart.update();
+                        var timeString = new Date(data.label).toTimeString().split(' ')[0];
+                        console.log(data.current_value);
+                        data.current_value = data.current_value.reverse();
+                        chart.addData(data.current_value, timeString);
                     }
+                    chart.update();
                 });
             };
             var on_error =  function() {

@@ -174,27 +174,4 @@ object Application extends Controller {
 
 
   }
-
-  def datapush =  WebSocket.using[String] { request =>
-    //Concurernt.broadcast returns (Enumerator, Concurrent.Channel)
-
-    val (out,channel) = Concurrent.broadcast[String]
-    //log the message to stdout and send response back to client
-
-    val (in) = Iteratee.foreach[String] {
-
-      msg => {
-
-        val json: JsValue = Json.parse(msg)
-        val feedID = json \ "datastreams" \\ "id"
-        for (i <- 0 to (json \ "datastreams" \\ "id").length) {
-          println((json \ "datastreams" \\ "id").apply(i).as[String])
-          //queue.enqueue(new Datastream((json \ "feedID").as[String].toInt, (json \ "datastreams" \\ "id").apply(i).as[String], (json \ "datastreams" \\ "current_value").apply(i).as[String].toFloat, DateTime.parse((json \ "datastreams" \\ "at").apply(i).as[String])));
-          //println(queue);
-        }
-      }
-    }
-
-    (in,out)
-  }
 }
