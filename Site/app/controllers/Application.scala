@@ -11,7 +11,7 @@ import play.api.libs.iteratee.{Enumerator, Iteratee, Concurrent}
 import org.joda.time.DateTime
 import play.api.libs.json._
 import play.api.mvc._
-
+import models.Statistics._
 import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
 import scala.concurrent.{Future, Await}
@@ -163,7 +163,13 @@ object Application extends Controller {
     )
   }
 
-
+  def getAverages(feedID: Int) = Action {
+    /*println("here")
+    models.Statistics.getAverageDataStreamValues(feedID).map(res =>
+      Ok(res.toString)
+    )*/
+    Ok(models.Statistics.getAverageDataStreamValues(feedID).toString)
+  }
 
   def feeds(userID: Int) = Action.async {
     //Create tables
