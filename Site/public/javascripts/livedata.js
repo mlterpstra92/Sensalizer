@@ -102,6 +102,80 @@ $(document ).ready(function() {
                     console.log("cool");
                 }
             });
+            /*
+                url: "feed/"+feedID,
+                method: 'GET',
+                content: 'json',
+                success: function (d) {
+                    $("#graphModForm").show();
+                    d.datasets = d.datasets[0];
+
+                    for (var i = 0; i < d.datasets.length; ++i)
+                        d.datasets[i] = d.datasets[i][0];
+
+
+                    $.each(d.datasets, function(idx, dataset){
+                        var inputID = "check" + dataset.label;
+
+                        $("#graphModForm ul").append("<li><a href=\"#\"><input type=\"checkbox\" id=\"" + inputID + "\" checked><span class=\"lbl\">" + dataset.label + "</span></a></li>");
+                        $("#graphModForm ul > li > a").attr('checked', true);
+                    });
+                    /*
+                    if (!d || d.datasets || d.datasets.length == 0)
+                        d = JSON.parse("{\"labels\":[\"x\",\"y\",\"z\",\"shake\"],\"datasets\":[{\"pointStrokeColor\":\"#fff\",\"data\":[14],\"label\":\"x\",\"pointHighlightFill\":\"#fff\",\"pointColor\":\"rgba(0,200,200,1)\",\"pointHighlightStroke\":\"rgba(0,200,200,1)\",\"strokeColor\":\"rgba(0,200,200,1)\",\"fillColor\":\"rgba(0,200,200,0.0)\"},{\"pointStrokeColor\":\"#fff\",\"data\":[14],\"label\":\"y\",\"pointHighlightFill\":\"#fff\",\"pointColor\":\"rgba(0,200,200,1)\",\"pointHighlightStroke\":\"rgba(0,200,200,1)\",\"strokeColor\":\"rgba(0,200,200,1)\",\"fillColor\":\"rgba(0,200,200,0.0)\"},{\"pointStrokeColor\":\"#fff\",\"data\":[14],\"label\":\"z\",\"pointHighlightFill\":\"#fff\",\"pointColor\":\"rgba(0,200,200,1)\",\"pointHighlightStroke\":\"rgba(0,200,200,1)\",\"strokeColor\":\"rgba(0,200,200,1)\",\"fillColor\":\"rgba(0,200,200,0.0)\"},{\"pointStrokeColor\":\"#fff\",\"data\":[14],\"label\":\"shake\",\"pointHighlightFill\":\"#fff\",\"pointColor\":\"rgba(0,200,200,1)\",\"pointHighlightStroke\":\"rgba(0,200,200,1)\",\"strokeColor\":\"rgba(0,200,200,1)\",\"fillColor\":\"rgba(0,200,200,0.0)\"}]}"); d.labels = [(hours + ":" + minutes + ":" + seconds)]; for (var i = 0; i < d.datasets.length - 1; ++i) d.labels.push("");
+
+                    var now = new Date();
+                    now.setSeconds(now.getSeconds() - 4);
+                    var hours, minutes, seconds;
+                    hours = padLeft(now.getUTCHours(), 2);
+                    minutes = padLeft(now.getUTCMinutes(), 2);
+                    seconds = padLeft(now.getUTCSeconds(), 2);
+                    d.labels = [];
+
+                    d.labels.push(hours + ":" + minutes + ":" + seconds);
+                    for (var i = 0; i < d.datasets.length - 1; ++i)
+                        d.labels.push("");*/
+
+                    //add some colors, maximum of four. Add more if more datasets
+                    var colors = ["rgba(200,0,0,1)","rgba(0,200,0,1)","rgba(0,0,200,1)","rgba(200,200,200,1)"]
+                    for (var i = 0; i < d.datasets.length; ++i) {
+                        d.datasets[i].pointColor = colors[i];
+                        d.datasets[i].strokeColor = colors[i];
+                    }
+
+                    //legend!
+                    var options = {
+                        responsive : true,
+                        animation: false,
+                        barValueSpacing : 5,
+                        barDatasetSpacing : 1,
+                        showTooltips: true,
+                        label: {format: 'shortTime'},
+                        legendTemplate : '<ul id="legend">'
+                            +'<% for (var i=0; i<datasets.length; i++) { %>'
+                            +'<li id=\"li<%=i%>\">'
+                            +'<% if (datasets[i].label) { %><%= datasets[i].label %><% } %>'
+                            +'</li>'
+                            +'<% } %>'
+                            +'</ul>'
+                    }
+
+                    var chart = new Chart(ct).Line(d, options);
+                    var legendHTML = document.getElementById("legend");
+                    if (legendHTML)
+                        legendHTML.innerHTML = chart.generateLegend();
+
+                    document.styleSheets[0].addRule('#legend','list-style: none', 'padding:0', 'margin:0');
+                    for (var i = 0; i < d.datasets.length; ++i) {
+                        document.styleSheets[0].addRule('#li'+i, 'display: inline');
+                        document.styleSheets[0].addRule('#li'+i+':before','content: "▪"; ' +
+                            'color: '+colors[i]+';'+
+                            'display: inline;' +
+                            'vertical-align: middle;' +
+                            'position: relative;' +
+                            'font-size: 3em;' +
+                            'padding-right: 10px');
+                    }
 
             var RabbitMQIP = "54.171.108.54";
             var ws = new SockJS('http://' + RabbitMQIP + ':15674/stomp');
