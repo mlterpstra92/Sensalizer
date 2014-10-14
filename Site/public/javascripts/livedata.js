@@ -102,22 +102,7 @@ $(document ).ready(function() {
                     console.log("cool");
                 }
             });
-            $.ajax({
-                type: "GET",
-                url: "getAverages/"+feedID,
-                success: function(a){
-                    console.log(a);
-                    document.getElementById("averageStatistics").innerText = a
-                }
-            });
-            $.ajax({
-                type: "GET",
-                url: "getMaximum/"+feedID,
-                success: function(a){
-                    console.log(a);
-                    document.getElementById("minmaxStatistics").innerText = a
-                }
-            });
+
             var RabbitMQIP = "54.171.108.54";
             var ws = new SockJS('http://' + RabbitMQIP + ':15674/stomp');
             var client = Stomp.over(ws);
@@ -184,6 +169,14 @@ $(document ).ready(function() {
                     success: function (a) {
                         console.log(a);
                         document.getElementById("averageStatistics").innerText = a
+                    }
+                });
+                $.ajax({
+                    type: "GET",
+                    url: "getMaximum/" + feedID,
+                    success: function (a) {
+                        console.log(a);
+                        document.getElementById("minmaxStatistics").innerText = a
                     }
                 });
             }, 2000);

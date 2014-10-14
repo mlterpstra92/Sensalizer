@@ -124,11 +124,8 @@ object Application extends Controller {
 
     println("Pushed db messages")
     implicit val mqtt = getMQTT(feedIDStr, apiKeyStr)
-    //println(mqtt)
     withIt(conn => {
-      //println("got connection")
       conn.subscribe(Array(new Topic("/v2/feeds/" + feedIDStr, QoS.AT_LEAST_ONCE)))
-      //println("Got topic")
       while (true) {
         val message = conn.receive()
         val msg = new String(message.getPayload)
@@ -159,20 +156,18 @@ object Application extends Controller {
 
   def feed(feedID: Int) = Action.async {
     models.Datastreams.getDatastreamIDs(feedID).map(res =>
-      Ok("HALLO")//Ok(createJsonFromDatastreams(feedID, res)).as("application/json")
+      Ok("HALLO")
     )
   }
 
   def getAverages(feedID: Int) = Action {
-    /*println("here")
-    models.Statistics.getAverageDataStreamValues(feedID).map(res =>
-      Ok(res.toString)
-    )*/
     Ok(models.Statistics.getAverageDataStreamValues(feedID).map(q => "%s: %s".format(q._1, q._2)).mkString("\n"))
   }
 
   def getMinMax(feedID: Int) = Action {
-    Ok("Minimal: %s\nMaximum: %s".format(models.Statistics.getminimumValues(feedID), models.Statistics.getMaximumValues(feedID)))
+    val min = models.Statistics.getminimumValues(feedID).map(q => "%s: %s".format(q._1, q._2)).mkString("\n")
+    val max = models.Statistics.getMaximumValues(feedID).map(q => "%s: %s".format(q._1, q._2)).mkString("\n")
+    Ok("Minimal: %s\nMaximum: %s".format(min, max))
   }
 
 
