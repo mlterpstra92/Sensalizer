@@ -57,4 +57,8 @@ object Feeds extends Feeds with MyDBConnector {
   def getList: Future[Seq[Feed]] = {
     select.fetch
   }
+  def getFeedIDs: Future[Seq[Int]] = {
+    select(_.feedID).fetch
+  }
+
 }
