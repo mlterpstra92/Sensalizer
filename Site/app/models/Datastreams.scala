@@ -47,7 +47,7 @@ object Datastreams extends Datastreams with MyDBConnector {
   // select.where(_.id eqs UUID.randomUUID()).one() translates to
   // SELECT * FROM my_custom_table WHERE id = the_id_value LIMIT 1;
   def getDatastreamIDs(feedID: Int): Future[Seq[String]] = {
-    select(_.streamID).where(_.feedID eqs feedID).fetch()
+    select(_.streamID).allowFiltering().where(_.feedID eqs feedID).fetch()
   }
 
   def getDataValueByStreamID(feedID: Int, streamID: String): Future[Seq[Float]] = {
@@ -58,6 +58,9 @@ object Datastreams extends Datastreams with MyDBConnector {
     select(_.insertionTime).where(_.feedID eqs feedID).one()
   }
 
+  def getInsertionTimes(feedID: Int): Future[Seq[DateTime]] = {
+    select(_.insertionTime).where(_.feedID eqs feedID).fetch
+  }
 
 
   /*

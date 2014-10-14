@@ -1,32 +1,6 @@
-$(document ).ready(function(){
+$(document ).ready(function() {
     $("#graphModForm").hide();
-    var data = {
-        labels: ["January", "February", "March", "April", "May", "June", "July"],
-        datasets:
-            [
-                {
-                    label: "My First dataset",
-                    fillColor: "rgba(220,220,220,0.2)",
-                    strokeColor: "rgba(220,220,220,1)",
-                    pointColor: "rgba(220,220,220,1)",
-                    pointStrokeColor: "#fff",
-                    pointHighlightFill: "#fff",
-                    pointHighlightStroke: "rgba(220,220,220,1)",
-                    data: [65, 59, 80, 81, 56, 55, 40]
-                },
-                {
-                    label: "My Second dataset",
-                    fillColor: "rgba(151,187,205,0.2)",
-                    strokeColor: "rgba(151,187,205,1)",
-                    pointColor: "rgba(151,187,205,1)",
-                    pointStrokeColor: "#fff",
-                    pointHighlightFill: "#fff",
-                    pointHighlightStroke: "rgba(151,187,205,1)",
-                    data: [28, 48, 40, 19, 86, 27, 90]
-                }
-            ]
-    };
-    var ratio = $("#canvasContainer").height()/$("#canvasContainer").width();
+    var ratio = $("#canvasContainer").height() / $("#canvasContainer").width();
     //Get the context of the canvas element we want to select
     var c = $('#feedGraph');
     var ct = c.get(0).getContext('2d');
@@ -36,29 +10,21 @@ $(document ).ready(function(){
     $(window).resize(respondCanvas);
     var steps = 3;
     var max = 100;
-    /*var options = {
-        responsive : true,
+    var options = {
+        responsive: true,
         animation: false,
-        barValueSpacing : 5,
-        barDatasetSpacing : 1,
-        showTooltips: true
+        barValueSpacing: 5,
+        barDatasetSpacing: 1,
+        showTooltips: true,
+        label: {format: 'shortTime'}
 
-        animation : false,
-         responsive : true/*,
-         animationEasing: 'easeOutQuart',
-         animationSteps: 500,
-         segmentShowStroke: true,
-         segmentStrokeColor: 'FFF',
-         scaleOverride: true,
-         scaleSteps: steps,
-         scaleStepWidth: Math.ceil(max / steps),
-         scaleStartValue: 0
-    };*/
+    };
 
     var chart;
+
     function respondCanvas() {
         c.attr('width', $("#canvasContainer").width());
-        c.attr('height', $("#canvasContainer").width()*(ratio));
+        c.attr('height', $("#canvasContainer").width() * (ratio));
         //Call a function to redraw other content (texts, images etc)
         //chart = new Chart(ct).Line(data, options);
     }
@@ -66,48 +32,77 @@ $(document ).ready(function(){
     //Initial call
     respondCanvas();
 
-    function padLeft(nr, n, str){
-        return Array(n-String(nr).length+1).join(str||'0')+nr;
+    function padLeft(nr, n, str) {
+        return Array(n - String(nr).length + 1).join(str || '0') + nr;
     }
 
     JSON.stringify = JSON.stringify || function (obj) {
         var t = typeof (obj);
         if (t != "object" || obj === null) {
             // simple data type
-            if (t == "string") obj = '"'+obj+'"';
+            if (t == "string") obj = '"' + obj + '"';
             return String(obj);
         }
         else {
             // recurse array or object
             var n, v, json = [], arr = (obj && obj.constructor == Array);
             for (n in obj) {
-                v = obj[n]; t = typeof(v);
-                if (t == "string") v = '"'+v+'"';
+                v = obj[n];
+                t = typeof(v);
+                if (t == "string") v = '"' + v + '"';
                 else if (t == "object" && v !== null) v = JSON.stringify(v);
                 json.push((arr ? "" : '"' + n + '":') + String(v));
             }
             return (arr ? "[" : "{") + String(json) + (arr ? "]" : "}");
         }
     };
-    function isChecked(id){
-        var inputID = "check"+id+":checked";
-        return true;
-        /*console.log($(inputID));
-         console.log($(inputID).attr('checked'));
-         return $(inputID).val();*/
-    }
+    var getSortedIndex = function (arr) {
+        var index = [];
+        for (var i = 0; i < arr.length; i++) {
+            index.push(i);
+        }
+        index = index.sort((function(arr){
+            /* this will sort ints in descending order, change it based on your needs */
+            return function (a, b) {return ((arr[a] > arr[b]) ? 1 : ((arr[a] < arr[b]) ? -1 : 0));
+            };
+        })(arr));
+        return index;
+    };
+    var sortMultipleArrays = function (sort, followers) {
+        var index = getSortedIndex(sort)
+            , followed = [];
+        followers.unshift(sort);
+        followers.forEach(function(arr){
+            var _arr = [];
+            for(var i = 0; i < arr.length; i++)
+                _arr[i] = arr[index[i]];
+            followed.push(_arr);
+        });
+        var result =  {sorted: followed[0]};
+        followed.shift();
+        result.followed = followed;
+        return result;
+    };
+
+
+
     //Apparently, we eat click events, so use event delegation
-    $(this ).on('click', 'button', function(e){
+    $(this).on('click', 'button', function (e) {
         e.preventDefault();
 
-        //If a feed management is called, perform those actions
-        //That is, load the feed the user clicks on using AJAX
-        if (e.currentTarget.id == "selectFeed"){
-            //this     td       tr        first td      its data without spaces
+        if (e.currentTarget.id == "selectFeed") {
             var feedID = $(this).parent().parent().find('td')[0].innerHTML.trim();
-            var apiKey = $(this ).parent().parent().find('td')[3].innerHTML.trim();
-            xively.setKey( apiKey );
+            var apiKey = $(this).parent().parent().find('td')[3].innerHTML.trim();
+
             $.ajax({
+                type: "POST",
+                url: "triggerFeed",
+                data: {feedid: feedID, apikey: apiKey},
+                success: function(a){
+                    console.log("cool");
+                }
+            });
+            /*
                 url: "feed/"+feedID,
                 method: 'GET',
                 content: 'json',
@@ -125,6 +120,7 @@ $(document ).ready(function(){
                         $("#graphModForm ul").append("<li><a href=\"#\"><input type=\"checkbox\" id=\"" + inputID + "\" checked><span class=\"lbl\">" + dataset.label + "</span></a></li>");
                         $("#graphModForm ul > li > a").attr('checked', true);
                     });
+                    /*
                     if (!d || d.datasets || d.datasets.length == 0)
                         d = JSON.parse("{\"labels\":[\"x\",\"y\",\"z\",\"shake\"],\"datasets\":[{\"pointStrokeColor\":\"#fff\",\"data\":[14],\"label\":\"x\",\"pointHighlightFill\":\"#fff\",\"pointColor\":\"rgba(0,200,200,1)\",\"pointHighlightStroke\":\"rgba(0,200,200,1)\",\"strokeColor\":\"rgba(0,200,200,1)\",\"fillColor\":\"rgba(0,200,200,0.0)\"},{\"pointStrokeColor\":\"#fff\",\"data\":[14],\"label\":\"y\",\"pointHighlightFill\":\"#fff\",\"pointColor\":\"rgba(0,200,200,1)\",\"pointHighlightStroke\":\"rgba(0,200,200,1)\",\"strokeColor\":\"rgba(0,200,200,1)\",\"fillColor\":\"rgba(0,200,200,0.0)\"},{\"pointStrokeColor\":\"#fff\",\"data\":[14],\"label\":\"z\",\"pointHighlightFill\":\"#fff\",\"pointColor\":\"rgba(0,200,200,1)\",\"pointHighlightStroke\":\"rgba(0,200,200,1)\",\"strokeColor\":\"rgba(0,200,200,1)\",\"fillColor\":\"rgba(0,200,200,0.0)\"},{\"pointStrokeColor\":\"#fff\",\"data\":[14],\"label\":\"shake\",\"pointHighlightFill\":\"#fff\",\"pointColor\":\"rgba(0,200,200,1)\",\"pointHighlightStroke\":\"rgba(0,200,200,1)\",\"strokeColor\":\"rgba(0,200,200,1)\",\"fillColor\":\"rgba(0,200,200,0.0)\"}]}"); d.labels = [(hours + ":" + minutes + ":" + seconds)]; for (var i = 0; i < d.datasets.length - 1; ++i) d.labels.push("");
 
@@ -138,7 +134,7 @@ $(document ).ready(function(){
 
                     d.labels.push(hours + ":" + minutes + ":" + seconds);
                     for (var i = 0; i < d.datasets.length - 1; ++i)
-                        d.labels.push("");
+                        d.labels.push("");*/
 
                     //add some colors, maximum of four. Add more if more datasets
                     var colors = ["rgba(200,0,0,1)","rgba(0,200,0,1)","rgba(0,0,200,1)","rgba(200,200,200,1)"]
@@ -181,85 +177,83 @@ $(document ).ready(function(){
                             'padding-right: 10px');
                     }
 
-                    xively.feed.subscribe(feedID, function(event, data){
-                        var emptyIndex = d.labels.indexOf("");
-                        if (emptyIndex != -1)
-                            d.labels.splice(emptyIndex, 1);
-                        var label = data.updated.split('T' )[1].split('.' )[0];
-                        var vals = [];
-                        for (var i = 0; i < data.datastreams.length; ++i)
-                        {
-                            if (isChecked(data.datastreams[i].id))
-                                vals.push(data.datastreams[i].current_value);
-                        }
+            var RabbitMQIP = "54.171.108.54";
+            var ws = new SockJS('http://' + RabbitMQIP + ':15674/stomp');
+            var client = Stomp.over(ws);
+            // SockJS does not support heart-beat: disable heart-beats
+            client.heartbeat.incoming = 0;
+            client.heartbeat.outgoing = 0;
 
-                        var myData = {
-                            feedID: feedID,
-                            datastreams: data.datastreams
-                        };
-                        myData = JSON.stringify(myData);
-                        if (!chart) {
-                            d.datasets = data.datastreams;
-                            d.labels = [];
-                            var date = new Date(Date.parse(data.updated));
-                            console.log(date.getTimezoneOffset());
-                            date.setHours(date.getHours() + date.getTimezoneOffset());
-                            d.labels.push(date.toLocaleTimeString());
+            var first = true;
+            var chart = null;
 
-                            d.labels.push(date);
-                            for (var i = 0; i < d.datasets.length - 1; ++i)
-                                d.labels.push("");
-                            console.log(d);
+            var on_connect = function(x) {
+                id = client.subscribe("/queue/sensalizer", function(m) {
+                    // reply by sending the reversed text to the temp queue defined in the "reply-to" header
+                    // console.log("SUCCESS!");
+                    var data = JSON.parse(m.body);
+                    if (first) {
+                        console.log(data);
+                        if (data && data.datasets) {
+                            var followers = [];
+                            for (var j in data.datasets) {
+                                for (var q in data.datasets[j])
+                                    followers.push(data.datasets[j][q].data)
+                            }
+                            //console.log(followers)
 
-                            chart = new Chart(ct).Line(d, options);
-                        }
-                        else {
-                            var format = "HH:mm:ss";
-                            if ($("#liveData").prop('checked'))
-                            {
-                                var date = new Date(Date.parse(data.updated));
-                                chart.addData(vals, date.toLocaleTimeString());
+                            var res = sortMultipleArrays(data.labels, followers);
+                            //console.log(res);
+                            data.labels = res.sorted;
+                            var order = data.labels;
+                            for (var z = 0; z < res.followed.length; ++z) {
+                                data.datasets[0][z] = res.followed[z];
                             }
                         }
-                        /*$.ajax({
-                         url: 'datapush',
-                         type: 'POST',
-                         data: myData,
-                         contentType: "application/json; charset=utf-8",
-                         dataType: 'json',
-                         success: function(){
-                         console.log("WOOPWOOP");
-                         },
-                         error: function(e){
-                         console.log(e);
-                         }
-                         });*/
-                        var connection = new WebSocket('ws://localhost:9000/datapush', 'json');
-                        // When the connection is open, send some data to the server
-                        connection.onopen = function () {
-                            connection.send(myData); // Send the message 'Ping' to the server
-                        };
-
-                        // Log errors
-                        connection.onerror = function (error) {
-                            console.log('WebSocket Error ' + error);
-                        };
-
-                        // Log messages from the server
-                        connection.onmessage = function (e) {
-                            console.log('Server: ' + e.data);
-                        };
 
 
-                        chart.update();
-                    });
-
-                },
-                error: function (xhr, ajaxOptions, thrownError) {
-                    alert(xhr.status);
-                    alert(thrownError);
-                }
-            });
+                        if (data && data.labels) {
+                            for (var i in data.labels)
+                                data.labels[i] = new Date(data.labels[i]).toTimeString().split(' ')[0];
+                        }
+                        data.datasets = data.datasets[0];
+                        console.log(data);
+                        chart = new Chart(ct).Line(data, options);
+                        first = false
+                    }
+                    else
+                    {
+                        var timeString = new Date(data.label).toTimeString().split(' ')[0];
+                        console.log(data.current_value);
+                        data.current_value = data.current_value.reverse();
+                        chart.addData(data.current_value, timeString);
+                    }
+                    chart.update();
+                });
+            };
+            var on_error =  function() {
+                console.log('error');
+            };
+            client.connect('guest', 'guest', on_connect, on_error, '/');
+            setInterval(function(){
+                console.log("called");
+                $.ajax({
+                    type: "GET",
+                    url: "getAverages/" + feedID,
+                    success: function (a) {
+                        console.log(a);
+                        document.getElementById("averageStatistics").innerText = a
+                    }
+                });
+                $.ajax({
+                    type: "GET",
+                    url: "getMaximum/" + feedID,
+                    success: function (a) {
+                        console.log(a);
+                        document.getElementById("minmaxStatistics").innerText = a
+                    }
+                });
+            }, 2000);
         }
     });
 });
