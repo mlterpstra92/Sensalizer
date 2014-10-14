@@ -1,5 +1,6 @@
 package models
 
+import com.rabbitmq.client.{Channel, Connection, ConnectionFactory}
 import controllers.Application._
 import play.api._
 import play.api.libs.json.{Json, JsValue}
@@ -14,7 +15,7 @@ import scala.concurrent.duration._
 /**
  * Created by Stefan on 14-Oct-14.
  */
-object XivelyConnect extends Controller{
+object XivelyConnect {
 
 
 
@@ -23,11 +24,18 @@ object XivelyConnect extends Controller{
     triggerFeed()
   }
 
+  val QUEUE_NAME = "sensalizer"
 
-  def triggerFeed (){
+  val factory: ConnectionFactory = new ConnectionFactory();
+    factory.setHost("54.171.108.54");
+  val connection: Connection = factory.newConnection()
+  val channel: Channel = connection.createChannel();
+  channel.queueDeclare(QUEUE_NAME, true, false, false, null);
+
+
+  def triggerFeed () {
     println("LIFE is Live")
-
-    val feeds = Await.result(models.Feeds.getFeedIDs , 5 seconds)
+    val feeds = Await.result(models.Feeds.getFeedIDs, 5 seconds)
     println(feeds)
     feeds.map(feed => {
 
@@ -44,5 +52,6 @@ object XivelyConnect extends Controller{
       channel.basicPublish("", QUEUE_NAME, null, createJsonFromDatastreams(feed, labels, dataValues, timestamps).getBytes())
     }
     )
+
   }
 }

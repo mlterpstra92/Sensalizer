@@ -171,6 +171,14 @@ object Application extends Controller {
     Ok(models.Statistics.getAverageDataStreamValues(feedID).toString)
   }
 
+  def getMaximum(feedID: Int) = Action {
+    Ok(models.Statistics.getMaximumValues(feedID).toString)
+  }
+
+  def getMinimum(feedID: Int) = Action {
+    Ok(models.Statistics.getMinimumValues(feedID).toString)
+  }
+
   def feeds(userID: Int) = Action.async {
     //Create tables
     //Await.result(models.Feeds.createTable, 5000 millis)

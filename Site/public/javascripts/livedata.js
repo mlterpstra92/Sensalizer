@@ -102,12 +102,21 @@ $(document ).ready(function() {
                     console.log("cool");
                 }
             });
+            /*
             $.ajax({
                 type: "GET",
                 url: "getAverages/"+feedID,
                 success: function(a){
                     console.log(a);
                     document.getElementById("averageStatistics").innerText = a
+                }
+            });*/
+            $.ajax({
+                type: "GET",
+                url: "getMaximum/"+feedID,
+                success: function(a){
+                    console.log(a);
+                    document.getElementById("minmaxStatistics").innerText = a
                 }
             });
             var RabbitMQIP = "54.171.108.54";

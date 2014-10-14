@@ -26,4 +26,21 @@ object Statistics {
     Future(seq)*/
     myTable.count
   }
+
+  def getMaximumValues(feedID: Int): Long = {
+
+    val temp = myTable.map(_.getFloat("currentValue")).collect().max
+    //val row = myTable.select("currentValue").where("feedID = ? ", feedID).groupBy(_ => "streamid")
+    println(temp.toLong)
+    temp.toLong
+
+  }
+  def getMinimumValues(feedID: Int): Long = {
+
+    val row = myTable.select("currentValue").where("feedID = ? ", feedID).groupBy(_ => "streamid")
+    println(row.toDebugString)
+    0l
+
+  }
+
 }
