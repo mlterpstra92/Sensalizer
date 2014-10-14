@@ -2,11 +2,11 @@
  * Created by folkert on 23-9-14.
  */
 
+import controllers.XivelyConnect
 import play.api._
 import play.api.mvc._
 import play.api.mvc.Results._
 import scala.concurrent.Future
-import models.XivelyConnect
 
 object Global extends GlobalSettings {
   // called when a route is found, but it was not possible to bind the request parameters
