@@ -15,36 +15,34 @@ import scala.concurrent.duration._
  * Created by Stefan on 14-Oct-14.
  */
 object XivelyConnect extends Controller{
+
+
+
   def start() {
     Logger.info("Awsome!")
-    val feeds = Await.result(models.Feeds.getFeedIDs , 5 seconds)
-
-    feeds.map(feed => {
-      println(feed)
-    }
-    )
+    triggerFeed()
   }
 
-  def triggerFeed = Action { request =>
 
+  def triggerFeed (){
+    println("LIFE is Live")
 
     val feeds = Await.result(models.Feeds.getFeedIDs , 5 seconds)
-
+    println(feeds)
     feeds.map(feed => {
 
-      val apiKey = "abcaslkhdalkshjd"
+      val apiKey = "ChaM9GovFEW6Q2dFuQTAVucAl4bJvJKsQNVS3pars6QDVirs"
       val labels = Await.result(models.Datastreams.getDatastreamIDs(feed), 2 seconds).distinct.toList
       val dataValues: util.ArrayList[List[Float]] = new util.ArrayList[List[Float]];
       labels.map(label => {
         val List: List[Float] = Await.result(models.Datastreams.getDataValueByStreamID(feed, label), 1500 millis).toList
         dataValues.add(List)
+        println(dataValues)
       })
       val timestamps = Await.result(models.Datastreams.getInsertionTimes(feed), 2 seconds).toList.distinct
       println(createJsonFromDatastreams(feed, labels, dataValues, timestamps))
       channel.basicPublish("", QUEUE_NAME, null, createJsonFromDatastreams(feed, labels, dataValues, timestamps).getBytes())
-
     }
-
-    Ok("");
+    )
   }
 }
