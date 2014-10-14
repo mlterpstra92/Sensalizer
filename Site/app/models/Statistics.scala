@@ -26,5 +26,6 @@ object Statistics {
   def getAverageDataStreamValues(feedID: Int): Array[(String, Float)] =
   {
     ssc.cassandraTable("sensalizer", "datastreams").where("feedid = ?", feedID).map(i => (i.getString("streamid"), i.getFloat("currentvalue"))).groupBy(_._1).map(i => (i._1, calcAvg(i._2.map(z => z._2).toList))).collect()
+
   }
 }
