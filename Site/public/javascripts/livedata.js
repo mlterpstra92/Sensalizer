@@ -8,20 +8,6 @@ $(document ).ready(function() {
     /*************************************************************************/
     //Run function when window resizes
     $(window).resize(respondCanvas);
-   /* var steps = 3;
-    var max = 100;
-    var options = {
-        responsive: true,
-        animation: false,
-        barValueSpacing: 5,
-        barDatasetSpacing: 1,
-        showTooltips: true,
-        label: {format: 'shortTime'}
-
-    };*/
-
-    var chart;
-
     function respondCanvas() {
         c.attr('width', $("#canvasContainer").width());
         c.attr('height', $("#canvasContainer").width() * (ratio));
@@ -103,31 +89,31 @@ $(document ).ready(function() {
                 }
             });
 
-                    //legend!
-                    var options = {
-                        responsive : true,
-                        animation: false,
-                        barValueSpacing : 5,
-                        barDatasetSpacing : 1,
-                        showTooltips: true,
-                        datasetFill: false,
-                        datasetStroke: false,
-                        label: {format: 'shortTime'},
-                        legendTemplate : '<ul id="legend">'
-                            +'<% for (var i=0; i<datasets.length; i++) { %>'
-                            +'<li id=\"li<%=i%>\">'
-                            +'<% if (datasets[i].label) { %><%= datasets[i].label %><% } %>'
-                            +'</li>'
-                            +'<% } %>'
-                            +'</ul>'
-                    }
+            //legend!
+            var options = {
+                responsive : true,
+                animation: false,
+                barValueSpacing : 5,
+                barDatasetSpacing : 1,
+                showTooltips: true,
+                datasetFill: false,
+                datasetStroke: false,
+                label: {format: 'shortTime'},
+                legendTemplate : '<ul id="legend">'
+                    +'<% for (var i=0; i<datasets.length; i++) { %>'
+                    +'<li id=\"li<%=i%>\">'
+                    +'<% if (datasets[i].label) { %><%= datasets[i].label %><% } %>'
+                    +'</li>'
+                    +'<% } %>'
+                    +'</ul>'
+            }
 
-                    //var chart = new Chart(ct).Line(d, options);
-                    var legendHTML = document.getElementById("legend");
-                    if (legendHTML)
-                        legendHTML.innerHTML = chart.generateLegend();
+            //var chart = new Chart(ct).Line(d, options);
+            var legendHTML = document.getElementById("legend");
+            if (legendHTML)
+                legendHTML.innerHTML = chart.generateLegend();
 
-                    document.styleSheets[0].addRule('#legend','list-style: none', 'padding:0', 'margin:0');
+            document.styleSheets[0].addRule('#legend','list-style: none', 'padding:0', 'margin:0');
 
 
             var RabbitMQIP = "54.171.108.54";
@@ -162,8 +148,6 @@ $(document ).ready(function() {
                             for (var z = 0; z < res.followed.length; ++z) {
                                 data.datasets[0][z] = res.followed[z];
                             }
-                            //add some colors, maximum of four. Add more if more datasets
-                            var colors = ["rgba(200,0,0,1)","rgba(0,200,0,1)","rgba(0,0,200,1)","rgba(200,200,200,1)"]
 
                         }
 
@@ -173,6 +157,8 @@ $(document ).ready(function() {
                                 data.labels[i] = new Date(data.labels[i]).toTimeString().split(' ')[0];
                         }
                         data.datasets = data.datasets[0];
+                        //add some colors, maximum of four. Add more if more datasets
+                        var colors = ["rgba(200,0,0,1)","rgba(0,200,0,1)","rgba(0,0,200,1)","rgba(200,200,200,1)"]
 
                         for (var z = 0; z < data.datasets.length; ++z) {
                             data.datasets[z].pointColor = colors[z];
