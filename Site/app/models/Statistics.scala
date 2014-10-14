@@ -1,7 +1,8 @@
 package models
 
-import org.apache.spark.{SparkContext, SparkConf}
-import com.datastax.spark.connector._
+import org.apache.spark.streaming.{Seconds, StreamingContext}
+import org.apache.spark.SparkConf
+import com.datastax.spark.connector.streaming._
 
 case class Statistics(feedID: Int) {
 }
@@ -15,16 +16,15 @@ object Statistics {
     .setSparkHome("/home/maarten/Downloads/spark-1.1.0-bin-hadoop2.4")
 
 
-  val sc = new SparkContext(conf)
-  val myTable = sc.cassandraTable("sensalizer", "datastreams")
+  val ssc = new StreamingContext(conf, Seconds(2))
+  //val myTable = sc.cassandraTable("sensalizer", "datastreams")
 
-  def calcAvg(list: Iterable[Float]): Long = {
-    val s = list.toList
-    (s.sum / s.length).toLong
+
+  def calcAvg(list: List[Float]): Float = {
+    list.sum / list.length
   }
-  def getAverageDataStreamValues(feedID: Int): Array[(String, Long)] =
+  def getAverageDataStreamValues(feedID: Int): Array[(String, Float)] =
   {
-    myTable.where("feedid = ?", feedID).map(i => (i.getString("streamid"), i.getFloat("currentvalue"))).groupBy(_._1).map(i => (i._1, calcAvg(i._2.map(z => z._2)))).collect()
-
+    ssc.cassandraTable("sensalizer", "datastreams").where("feedid = ?", feedID).map(i => (i.getString("streamid"), i.getFloat("currentvalue"))).groupBy(_._1).map(i => (i._1, calcAvg(i._2.map(z => z._2).toList))).collect()
   }
 }
