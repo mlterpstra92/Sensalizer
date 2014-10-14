@@ -102,7 +102,6 @@ $(document ).ready(function() {
                     console.log("cool");
                 }
             });
-            /*
             $.ajax({
                 type: "GET",
                 url: "getAverages/"+feedID,
@@ -110,7 +109,7 @@ $(document ).ready(function() {
                     console.log(a);
                     document.getElementById("averageStatistics").innerText = a
                 }
-            });*/
+            });
             $.ajax({
                 type: "GET",
                 url: "getMaximum/"+feedID,
@@ -160,6 +159,13 @@ $(document ).ready(function() {
                         }
                         data.datasets = data.datasets[0];
                         console.log(data);
+
+                        var colors = ["rgba(200,0,0,1)","rgba(0,200,0,1)","rgba(0,0,200,1)","rgba(200,200,200,1)"]
+                        for (var i = 0; i < data.datasets.length; ++i) {
+                            data.datasets[i].pointColor = colors[i];
+                            data.datasets[i].strokeColor = colors[i];
+                        }
+
                         chart = new Chart(ct).Line(data, options);
                         first = false
                     }
