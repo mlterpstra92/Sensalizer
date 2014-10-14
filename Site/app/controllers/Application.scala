@@ -53,7 +53,7 @@ object Application extends Controller {
 
           Map(
             "label" -> Json.toJson(label),
-            "fillColor" -> Json.toJson("rgba(0,200,200,0.0)"),
+            "fillColor" -> Json.toJson("rgba(0,200,200,1.0)"),
             "strokeColor" -> Json.toJson("rgba(0,200,200,1)"),
             "pointColor" -> Json.toJson("rgba(0,200,200,1)"),
             "pointStrokeColor" -> Json.toJson("#fff"),

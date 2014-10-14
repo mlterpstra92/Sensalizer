@@ -8,7 +8,7 @@ $(document ).ready(function() {
     /*************************************************************************/
     //Run function when window resizes
     $(window).resize(respondCanvas);
-    var steps = 3;
+   /* var steps = 3;
     var max = 100;
     var options = {
         responsive: true,
@@ -18,7 +18,7 @@ $(document ).ready(function() {
         showTooltips: true,
         label: {format: 'shortTime'}
 
-    };
+    };*/
 
     var chart;
 
@@ -102,46 +102,6 @@ $(document ).ready(function() {
                     console.log("cool");
                 }
             });
-            /*
-                url: "feed/"+feedID,
-                method: 'GET',
-                content: 'json',
-                success: function (d) {
-                    $("#graphModForm").show();
-                    d.datasets = d.datasets[0];
-
-                    for (var i = 0; i < d.datasets.length; ++i)
-                        d.datasets[i] = d.datasets[i][0];
-
-
-                    $.each(d.datasets, function(idx, dataset){
-                        var inputID = "check" + dataset.label;
-
-                        $("#graphModForm ul").append("<li><a href=\"#\"><input type=\"checkbox\" id=\"" + inputID + "\" checked><span class=\"lbl\">" + dataset.label + "</span></a></li>");
-                        $("#graphModForm ul > li > a").attr('checked', true);
-                    });
-                    /*
-                    if (!d || d.datasets || d.datasets.length == 0)
-                        d = JSON.parse("{\"labels\":[\"x\",\"y\",\"z\",\"shake\"],\"datasets\":[{\"pointStrokeColor\":\"#fff\",\"data\":[14],\"label\":\"x\",\"pointHighlightFill\":\"#fff\",\"pointColor\":\"rgba(0,200,200,1)\",\"pointHighlightStroke\":\"rgba(0,200,200,1)\",\"strokeColor\":\"rgba(0,200,200,1)\",\"fillColor\":\"rgba(0,200,200,0.0)\"},{\"pointStrokeColor\":\"#fff\",\"data\":[14],\"label\":\"y\",\"pointHighlightFill\":\"#fff\",\"pointColor\":\"rgba(0,200,200,1)\",\"pointHighlightStroke\":\"rgba(0,200,200,1)\",\"strokeColor\":\"rgba(0,200,200,1)\",\"fillColor\":\"rgba(0,200,200,0.0)\"},{\"pointStrokeColor\":\"#fff\",\"data\":[14],\"label\":\"z\",\"pointHighlightFill\":\"#fff\",\"pointColor\":\"rgba(0,200,200,1)\",\"pointHighlightStroke\":\"rgba(0,200,200,1)\",\"strokeColor\":\"rgba(0,200,200,1)\",\"fillColor\":\"rgba(0,200,200,0.0)\"},{\"pointStrokeColor\":\"#fff\",\"data\":[14],\"label\":\"shake\",\"pointHighlightFill\":\"#fff\",\"pointColor\":\"rgba(0,200,200,1)\",\"pointHighlightStroke\":\"rgba(0,200,200,1)\",\"strokeColor\":\"rgba(0,200,200,1)\",\"fillColor\":\"rgba(0,200,200,0.0)\"}]}"); d.labels = [(hours + ":" + minutes + ":" + seconds)]; for (var i = 0; i < d.datasets.length - 1; ++i) d.labels.push("");
-
-                    var now = new Date();
-                    now.setSeconds(now.getSeconds() - 4);
-                    var hours, minutes, seconds;
-                    hours = padLeft(now.getUTCHours(), 2);
-                    minutes = padLeft(now.getUTCMinutes(), 2);
-                    seconds = padLeft(now.getUTCSeconds(), 2);
-                    d.labels = [];
-
-                    d.labels.push(hours + ":" + minutes + ":" + seconds);
-                    for (var i = 0; i < d.datasets.length - 1; ++i)
-                        d.labels.push("");*/
-
-                    //add some colors, maximum of four. Add more if more datasets
-                    var colors = ["rgba(200,0,0,1)","rgba(0,200,0,1)","rgba(0,0,200,1)","rgba(200,200,200,1)"]
-                    for (var i = 0; i < d.datasets.length; ++i) {
-                        d.datasets[i].pointColor = colors[i];
-                        d.datasets[i].strokeColor = colors[i];
-                    }
 
                     //legend!
                     var options = {
@@ -150,6 +110,8 @@ $(document ).ready(function() {
                         barValueSpacing : 5,
                         barDatasetSpacing : 1,
                         showTooltips: true,
+                        datasetFill: false,
+                        datasetStroke: false,
                         label: {format: 'shortTime'},
                         legendTemplate : '<ul id="legend">'
                             +'<% for (var i=0; i<datasets.length; i++) { %>'
@@ -160,22 +122,13 @@ $(document ).ready(function() {
                             +'</ul>'
                     }
 
-                    var chart = new Chart(ct).Line(d, options);
+                    //var chart = new Chart(ct).Line(d, options);
                     var legendHTML = document.getElementById("legend");
                     if (legendHTML)
                         legendHTML.innerHTML = chart.generateLegend();
 
                     document.styleSheets[0].addRule('#legend','list-style: none', 'padding:0', 'margin:0');
-                    for (var i = 0; i < d.datasets.length; ++i) {
-                        document.styleSheets[0].addRule('#li'+i, 'display: inline');
-                        document.styleSheets[0].addRule('#li'+i+':before','content: "▪"; ' +
-                            'color: '+colors[i]+';'+
-                            'display: inline;' +
-                            'vertical-align: middle;' +
-                            'position: relative;' +
-                            'font-size: 3em;' +
-                            'padding-right: 10px');
-                    }
+
 
             var RabbitMQIP = "54.171.108.54";
             var ws = new SockJS('http://' + RabbitMQIP + ':15674/stomp');
@@ -209,6 +162,9 @@ $(document ).ready(function() {
                             for (var z = 0; z < res.followed.length; ++z) {
                                 data.datasets[0][z] = res.followed[z];
                             }
+                            //add some colors, maximum of four. Add more if more datasets
+                            var colors = ["rgba(200,0,0,1)","rgba(0,200,0,1)","rgba(0,0,200,1)","rgba(200,200,200,1)"]
+
                         }
 
 
@@ -217,7 +173,23 @@ $(document ).ready(function() {
                                 data.labels[i] = new Date(data.labels[i]).toTimeString().split(' ')[0];
                         }
                         data.datasets = data.datasets[0];
+
+                        for (var z = 0; z < data.datasets.length; ++z) {
+                            data.datasets[z].pointColor = colors[z];
+                            data.datasets[z].strokeColor = colors[z];
+                            data.datasets[z].fillColor = "rgba(255.0, 255.0, 255.0, 1.0)";
+
+                            document.styleSheets[0].addRule('#li'+i, 'display: inline');
+                            document.styleSheets[0].addRule('#li'+i+':before','content: "▪"; ' +
+                                'color: '+colors[i]+';'+
+                                'display: inline;' +
+                                'vertical-align: middle;' +
+                                'position: relative;' +
+                                'font-size: 3em;' +
+                                'padding-right: 10px');
+                        }
                         console.log(data);
+
                         chart = new Chart(ct).Line(data, options);
                         first = false
                     }
