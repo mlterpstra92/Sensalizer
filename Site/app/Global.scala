@@ -6,6 +6,7 @@ import play.api._
 import play.api.mvc._
 import play.api.mvc.Results._
 import scala.concurrent.Future
+import models.XivelyConnect
 
 object Global extends GlobalSettings {
   // called when a route is found, but it was not possible to bind the request parameters
@@ -21,5 +22,11 @@ object Global extends GlobalSettings {
   // 404 - page not found error
   override def onHandlerNotFound(request: RequestHeader) = {
     Future.successful(NotFound(views.html.errors.onHandlerNotFound(request)))
+  }
+
+  // On startup
+  override def onStart(app: Application) {
+    Logger.info("Application has started")
+    XivelyConnect.start()
   }
 }
