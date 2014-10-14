@@ -2,28 +2,29 @@ package models
 
 import org.apache.spark.{SparkContext, SparkConf}
 import com.datastax.spark.connector._
-import scala.concurrent.Future
-import play.api.libs.concurrent.Execution.Implicits._
+
 case class Statistics(feedID: Int) {
 }
 object Statistics {
+
   val conf = new SparkConf(true)
-    .set("cassandra.connection.host", MyDBConnector.ip)
     .set("spark.cassandra.connection.host", MyDBConnector.ip)
+    .setAppName("sensalizer")
+    .setMaster("local")
+    //.setMaster("spark://ec2-54-171-55-61.eu-west-1.compute.amazonaws.com:7077 ")
+    .setSparkHome("/home/maarten/Downloads/spark-1.1.0-bin-hadoop2.4")
 
 
-  val sc = new SparkContext("spark://ec2-54-171-55-61.eu-west-1.compute.amazonaws.com:7077", "sensalizer", conf)
+  val sc = new SparkContext(conf)
   val myTable = sc.cassandraTable("sensalizer", "datastreams")
 
-
-  def getAverageDataStreamValues(feedID: Int): Long =
+  def calcAvg(list: Iterable[Float]): Long = {
+    val s = list.toList
+    (s.sum / s.length).toLong
+  }
+  def getAverageDataStreamValues(feedID: Int): Array[(String, Long)] =
   {
+    myTable.where("feedid = ?", feedID).map(i => (i.getString("streamid"), i.getFloat("currentvalue"))).groupBy(_._1).map(i => (i._1, calcAvg(i._2.map(z => z._2)))).collect()
 
-    /*println(conf.toDebugString)
-    //myTable.toArray.foreach(println)
-    println(MyDBConnector.ip)
-    val seq: Seq[Float] = ((0 until 10) map {i => (i*i).toFloat}).toSeq
-    Future(seq)*/
-    myTable.count
   }
 }

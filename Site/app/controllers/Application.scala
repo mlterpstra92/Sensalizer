@@ -168,7 +168,7 @@ object Application extends Controller {
     models.Statistics.getAverageDataStreamValues(feedID).map(res =>
       Ok(res.toString)
     )*/
-    Ok(models.Statistics.getAverageDataStreamValues(feedID).toString)
+    Ok(models.Statistics.getAverageDataStreamValues(feedID).map(q => "%s: %s".format(q._1, q._2)).mkString("\n"))
   }
 
   def feeds(userID: Int) = Action.async {
