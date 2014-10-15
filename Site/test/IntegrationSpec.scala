@@ -18,7 +18,7 @@ class IntegrationSpec extends Specification {
 
       browser.goTo("http://localhost:" + port)
 
-      browser.pageSource must contain("Wat sense je wel?")
+      browser.pageSource must contain("Sensalizer")
     }
   }
 }
