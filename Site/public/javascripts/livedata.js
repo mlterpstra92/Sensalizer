@@ -156,7 +156,7 @@ $(document ).ready(function() {
                             for (var i in data.labels)
                                 data.labels[i] = new Date(data.labels[i]).toTimeString().split(' ')[0];
                         }
-                        data.datasets = data.datasets[0];
+                        //data.datasets = data.datasets[0];
                         //add some colors, maximum of four. Add more if more datasets
                         var colors = ["rgba(200,0,0,1)","rgba(0,200,0,1)","rgba(0,0,200,1)","rgba(200,200,200,1)"]
 
