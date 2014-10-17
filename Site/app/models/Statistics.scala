@@ -11,9 +11,9 @@ object Statistics {
   val conf = new SparkConf(true)
     .set("spark.cassandra.connection.host", MyDBConnector.ip)
     .setAppName("sensalizer")
-    .setMaster("local")
-    //.setMaster("spark://ec2-54-171-55-61.eu-west-1.compute.amazonaws.com:7077 ")
-    .setSparkHome("/home/maarten/Downloads/spark-1.1.0-bin-hadoop2.4")
+    //.setMaster("local")
+    .setMaster("spark://ec2-54-171-55-61.eu-west-1.compute.amazonaws.com:7077 ")
+    //.setSparkHome("/home/maarten/Downloads/spark-1.1.0-bin-hadoop2.4")
 
 
   val ssc = new StreamingContext(conf, Seconds(2))
