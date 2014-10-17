@@ -79,7 +79,7 @@ $(document ).ready(function() {
         if (e.currentTarget.id == "selectFeed") {
             var feedID = $(this).parent().parent().find('td')[0].innerHTML.trim();
             var apiKey = $(this).parent().parent().find('td')[3].innerHTML.trim();
-
+            console.log(apiKey);
             $.ajax({
                 type: "POST",
                 url: "triggerFeed",
@@ -158,16 +158,17 @@ $(document ).ready(function() {
                         }
                         data.datasets = data.datasets[0];
                         //add some colors, maximum of four. Add more if more datasets
-                        var colors = ["rgba(200,0,0,1)","rgba(0,200,0,1)","rgba(0,0,200,1)","rgba(200,200,200,1)"]
+
+                        var colors = ["rgba(200,0,0,1)","rgba(0,200,0,1)","rgba(0,0,200,1)","rgba(200,200,200,1)","rgba(150,0,100,1)","rgba(100,150,0,1)","rgba(0,1000,150,1)","rgba(100,0,150,1)","rgba(200,50,250,1)","rgba(250,100,0,1)","rgba(250,150,50,1)","rgba(250,50,100,1)","rgba(200,50,50,1)","rgba(50,200,50,1)","rgba(50,150,200,1)","rgba(100,200,0,1)","rgba(200,150,150,1)","rgba(50,200,50,1)","rgba(150,150,200,1)","rgba(0,50,250,1)"]
 
                         for (var z = 0; z < data.datasets.length; ++z) {
                             data.datasets[z].pointColor = colors[z];
                             data.datasets[z].strokeColor = colors[z];
                             data.datasets[z].fillColor = "rgba(255.0, 255.0, 255.0, 1.0)";
 
-                            document.styleSheets[0].addRule('#li'+i, 'display: inline');
-                            document.styleSheets[0].addRule('#li'+i+':before','content: "▪"; ' +
-                                'color: '+colors[i]+';'+
+                            document.styleSheets[0].addRule('#li'+z, 'display: inline');
+                            document.styleSheets[0].addRule('#li'+z+':before','content: "▪"; ' +
+                                'color: '+colors[z]+';'+
                                 'display: inline;' +
                                 'vertical-align: middle;' +
                                 'position: relative;' +

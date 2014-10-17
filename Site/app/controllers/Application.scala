@@ -125,6 +125,7 @@ object Application extends Controller {
     println("Pushed db messages")
     implicit val mqtt = getMQTT(feedIDStr, apiKeyStr)
     withIt(conn => {
+      println(feedIDStr)
       conn.subscribe(Array(new Topic("/v2/feeds/" + feedIDStr, QoS.AT_LEAST_ONCE)))
       while (true) {
         val message = conn.receive()
