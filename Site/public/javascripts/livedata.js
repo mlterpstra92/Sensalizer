@@ -75,7 +75,9 @@ $(document ).ready(function() {
     //Apparently, we eat click events, so use event delegation
     $(this).on('click', 'button', function (e) {
         e.preventDefault();
+        if (e.currentTarget.id == "addfeed"){
 
+        }
         if (e.currentTarget.id == "selectFeed") {
             var feedID = $(this).parent().parent().find('td')[0].innerHTML.trim();
             var apiKey = $(this).parent().parent().find('td')[3].innerHTML.trim();
