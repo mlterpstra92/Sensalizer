@@ -10,8 +10,8 @@ val phantomVersion = "1.2.2"
 
 libraryDependencies ++= Seq(
   "com.websudos"  %% "phantom-dsl"                   % phantomVersion,
-  "com.websudos"  %% "phantom-example"               % phantomVersion,
-  "com.websudos"  %% "phantom-spark"                 % phantomVersion,
+ // "com.websudos"  %% "phantom-example"               % phantomVersion,
+ // "com.websudos"  %% "phantom-spark"                 % phantomVersion,
   //"com.websudos"  %% "phantom-test"                  % phantomVersion,
   //"com.websudos"  %% "phantom-testing"               % phantomVersion,
   "com.websudos"  %% "phantom-udt"                   % phantomVersion,
@@ -24,6 +24,7 @@ libraryDependencies ++= Seq(
   "com.datastax.spark" %% "spark-cassandra-connector" % "1.1.0-alpha3" withSources() withJavadoc(),
   "com.typesafe.akka" %% "akka-actor" % "2.2.3",
   "com.typesafe.akka" %% "akka-slf4j" % "2.2.3"
+  //"com.tuplejump" %% "calliope-sql" % "1.1.0-CTP-U2"
 )
 
 

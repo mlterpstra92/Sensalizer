@@ -19,13 +19,13 @@ import scala.concurrent.duration._
 
 
 object Application extends Controller {
-  val QUEUE_NAME = "sensalizer"
+  /*val QUEUE_NAME = "sensalizer"
 
   val factory: ConnectionFactory = new ConnectionFactory();
   factory.setHost("54.171.108.54");
   val connection: Connection = factory.newConnection()
   val channel: Channel = connection.createChannel();
-  channel.queueDeclare(QUEUE_NAME, true, false, false, null);
+  channel.queueDeclare(QUEUE_NAME, true, false, false, null);*/
 
 
   def index = Action {
@@ -116,7 +116,7 @@ object Application extends Controller {
             })
             val timestamps = Await.result(models.Datastreams.getInsertionTimes(feedIDStr.toInt), 2 seconds).toList.distinct
             println(createJsonFromDatastreams(feedIDStr.toInt, labels, dataValues, timestamps))
-            channel.basicPublish("", QUEUE_NAME, null, createJsonFromDatastreams(feedIDStr.toInt, labels, dataValues, timestamps).getBytes())
+            //channel.basicPublish("", QUEUE_NAME, null, createJsonFromDatastreams(feedIDStr.toInt, labels, dataValues, timestamps).getBytes())
           }
         }
       case None => Application.Status(418);
@@ -148,7 +148,7 @@ object Application extends Controller {
             label)
           models.Datastreams.insertNewRecord(ds)
         }
-        channel.basicPublish("", QUEUE_NAME, null, newJson.getBytes)
+       // channel.basicPublish("", QUEUE_NAME, null, newJson.getBytes)
       }
     })
 
@@ -174,9 +174,9 @@ object Application extends Controller {
 
   def feeds(userID: Int) = Action.async {
     //Create tables
-    //Await.result(models.Feeds.createTable, 5000 millis)
-    //Await.result(models.Datastreams.createTable, 5000 millis)
-    //Await.result(models.Userstates.createTable, 5000 millis)
+    Await.result(models.Feeds.createTable, 5000 millis)
+    Await.result(models.Datastreams.createTable, 5000 millis)
+    Await.result(models.Userstates.createTable, 5000 millis)
     Feeds.getList.map(list => Ok(views.html.feeds(list, models.Login.getLoggedInUser(userID).APIKey)))
 
 

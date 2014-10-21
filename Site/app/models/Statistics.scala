@@ -1,8 +1,8 @@
 package models
 
 import org.apache.spark.streaming.{Seconds, StreamingContext}
-import org.apache.spark.SparkConf
-import com.datastax.spark.connector.streaming._
+import org.apache.spark.{SparkContext,SparkConf}
+import com.datastax.spark.connector._
 
 case class Statistics(feedID: Int) {
 }
@@ -10,14 +10,20 @@ object Statistics {
 
   val conf = new SparkConf(true)
     .set("spark.cassandra.connection.host", MyDBConnector.ip)
+    .set("spark.eventLog.enabled", true.toString)
+    .set("spark.eventLog.dir", "sparklogs")
     .setAppName("sensalizer")
     //.setMaster("local")
-    .setMaster("spark://ec2-54-171-55-61.eu-west-1.compute.amazonaws.com:7077 ")
-    //.setSparkHome("/home/maarten/Downloads/spark-1.1.0-bin-hadoop2.4")
+    .setMaster("spark://ec2-54-77-214-128.eu-west-1.compute.amazonaws.com:7077")
+    .setSparkHome("/root/spark")
 
 
-  val ssc = new StreamingContext(conf, Seconds(2))
-  //val myTable = sc.cassandraTable("sensalizer", "datastreams")
+  //val ssc = new StreamingContext(conf, Seconds(2))
+  val sc = new SparkContext(conf)
+
+
+
+  val myTable = sc.cassandraTable("sensalizer", "datastreams")
 
 
   def calcAvg(list: List[Float]): Float = {
@@ -25,18 +31,20 @@ object Statistics {
   }
   def getAverageDataStreamValues(feedID: Int): Array[(String, Float)] =
   {
-    ssc.cassandraTable("sensalizer", "datastreams").where("feedid = ?", feedID).map(i => (i.getString("streamid"), i.getFloat("currentvalue"))).groupBy(_._1).map(i => (i._1, calcAvg(i._2.map(z => z._2).toList))).collect()
-
+    //ssc.cassandraTable("sensalizer", "datastreams").where("feedid = ?", feedID).map(i => (i.getString("streamid"), i.getFloat("currentvalue"))).groupBy(_._1).map(i => (i._1, calcAvg(i._2.map(z => z._2).toList))).collect()
+      Array(("sadf", myTable.count().toFloat))
   }
 
   def getMaximumValues(feedID: Int): Array[(String ,Float)] =
   {
-    ssc.cassandraTable("sensalizer", "datastreams").where("feedid = ?", feedID).map(i => (i.getString("streamid"), i.getFloat("currentvalue"))).groupBy(_._1).map(i => (i._1, i._2.map(z => z._2).toList.max)).collect()
+    sc.cassandraTable("sensalizer", "datastreams").where("feedid = ?", feedID).map(i => (i.getString("streamid"), i.getFloat("currentvalue"))).groupBy(_._1).map(i => (i._1, i._2.map(z => z._2).toList.max)).collect()
+    //Array(("sadf", 234f))
 
   }
   def getminimumValues(feedID: Int): Array[(String ,Float)] =
   {
-    ssc.cassandraTable("sensalizer", "datastreams").where("feedid = ?", feedID).map(i => (i.getString("streamid"), i.getFloat("currentvalue"))).groupBy(_._1).map(i => (i._1, i._2.map(z => z._2).toList.min)).collect()
+    sc.cassandraTable("sensalizer", "datastreams").where("feedid = ?", feedID).map(i => (i.getString("streamid"), i.getFloat("currentvalue"))).groupBy(_._1).map(i => (i._1, i._2.map(z => z._2).toList.min)).collect()
+    //Array(("sadf", 234f))
 
   }
 }

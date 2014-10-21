@@ -196,7 +196,7 @@ $(document ).ready(function() {
                 console.log('error');
             };
             client.connect('guest', 'guest', on_connect, on_error, '/');
-            setInterval(function(){
+           // setInterval(function(){
                 console.log("called");
                 $.ajax({
                     type: "GET",
@@ -214,7 +214,7 @@ $(document ).ready(function() {
                         document.getElementById("minmaxStatistics").innerText = a
                     }
                 });
-            }, 2000);
+           // }, 2000);
         }
     });
 });
