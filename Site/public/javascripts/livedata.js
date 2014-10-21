@@ -158,19 +158,20 @@ $(document ).ready(function() {
                             for (var i in data.labels)
                                 data.labels[i] = new Date(data.labels[i]).toTimeString().split(' ')[0];
                         }
-                        //data.datasets = data.datasets[0];
+                        data.datasets = data.datasets[0];
                         //add some colors, maximum of four. Add more if more datasets
 
-                        var colors = ["rgba(200,0,0,1)","rgba(0,200,0,1)","rgba(0,0,200,1)","rgba(200,200,200,1)","rgba(150,0,100,1)","rgba(100,150,0,1)","rgba(0,1000,150,1)","rgba(100,0,150,1)","rgba(200,50,250,1)","rgba(250,100,0,1)","rgba(250,150,50,1)","rgba(250,50,100,1)","rgba(200,50,50,1)","rgba(50,200,50,1)","rgba(50,150,200,1)","rgba(100,200,0,1)","rgba(200,150,150,1)","rgba(50,200,50,1)","rgba(150,150,200,1)","rgba(0,50,250,1)"]
+                        //var colors = ["rgba(200,0,0,1)","rgba(0,200,0,1)","rgba(0,0,200,1)","rgba(200,200,200,1)","rgba(150,0,100,1)","rgba(100,150,0,1)","rgba(0,1000,150,1)","rgba(100,0,150,1)","rgba(200,50,250,1)","rgba(250,100,0,1)","rgba(250,150,50,1)","rgba(250,50,100,1)","rgba(200,50,50,1)","rgba(50,200,50,1)","rgba(50,150,200,1)","rgba(100,200,0,1)","rgba(200,150,150,1)","rgba(50,200,50,1)","rgba(150,150,200,1)","rgba(0,50,250,1)"]
 
                         for (var z = 0; z < data.datasets.length; ++z) {
-                            data.datasets[z].pointColor = colors[z];
-                            data.datasets[z].strokeColor = colors[z];
+                            var color='#'+(Math.random()*0xFFFFFF<<0).toString(16);
+                            data.datasets[z].pointColor = color;
+                            data.datasets[z].strokeColor = color;
                             data.datasets[z].fillColor = "rgba(255.0, 255.0, 255.0, 1.0)";
 
                             document.styleSheets[0].addRule('#li'+z, 'display: inline');
                             document.styleSheets[0].addRule('#li'+z+':before','content: "▪"; ' +
-                                'color: '+colors[z]+';'+
+                                'color: '+color+';'+
                                 'display: inline;' +
                                 'vertical-align: middle;' +
                                 'position: relative;' +
@@ -180,6 +181,7 @@ $(document ).ready(function() {
                         console.log(data);
 
                         chart = new Chart(ct).Line(data, options);
+                        $("#graphModForm").show();
                         first = false
                     }
                     else
@@ -187,7 +189,9 @@ $(document ).ready(function() {
                         var timeString = new Date(data.label).toTimeString().split(' ')[0];
                         console.log(data.current_value);
                         data.current_value = data.current_value.reverse();
-                        chart.addData(data.current_value, timeString);
+                        if ($("#liveData").prop('checked')){
+                            chart.addData(data.current_value, timeString);
+                        }
                     }
                     chart.update();
                 });

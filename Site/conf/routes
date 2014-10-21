@@ -12,6 +12,7 @@ GET         /assets/*file               controllers.Assets.at(path="/public", fi
 GET         /profile/:userID            controllers.Application.profile(userID: Int)
 GET         /feeds/:userID              controllers.Application.feeds(userID: Int)
 GET         /feed/:feedID               controllers.Application.feed(feedID: Int)
+GET         /addFeed                    controllers.Application.addFeed
 POST        /triggerFeed                controllers.Application.triggerFeed
 GET         /getAverages/:feedID        controllers.Application.getAverages(feedID: Int)
 GET         /getMaximum/:feedID         controllers.Application.getMinMax(feedID: Int)
