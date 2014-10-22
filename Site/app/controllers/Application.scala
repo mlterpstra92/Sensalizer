@@ -53,6 +53,7 @@ object Application extends Controller {
     Ok("Hi %s %s".format(newFeedID))
   }
 
+
   def createJsonFromDatastreams(feedID: Int, labels: Seq[String], data:util.ArrayList[List[Float]], timestamps: Seq[DateTime]): String = {
     val jsonObject = Json.toJson(
       Map(
