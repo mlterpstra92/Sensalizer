@@ -118,7 +118,7 @@ $(document ).ready(function() {
             document.styleSheets[0].addRule('#legend','list-style: none', 'padding:0', 'margin:0');
 
 
-            var RabbitMQIP = "54.171.108.54";
+            var RabbitMQIP = "54.171.159.157";
             var ws = new SockJS('http://' + RabbitMQIP + ':15674/stomp');
             var client = Stomp.over(ws);
             // SockJS does not support heart-beat: disable heart-beats

@@ -3,7 +3,7 @@ package models
 import org.apache.spark.streaming.{Seconds, StreamingContext}
 import org.apache.spark.{SparkContext,SparkConf}
 import com.datastax.spark.connector._
-
+/*
 case class Statistics(feedID: Int) {
 }
 object Statistics {
@@ -48,3 +48,4 @@ object Statistics {
 
   }
 }
+*/

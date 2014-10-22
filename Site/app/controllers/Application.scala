@@ -11,7 +11,7 @@ import play.api.libs.iteratee.{Enumerator, Iteratee, Concurrent}
 import org.joda.time.DateTime
 import play.api.libs.json._
 import play.api.mvc._
-import models.Statistics._
+//import models.Statistics._
 import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
 import scala.concurrent.{Future, Await}
@@ -170,21 +170,22 @@ object Application extends Controller {
   }
 
   def getAverages(feedID: Int) = Action {
-    Ok(models.Statistics.getAverageDataStreamValues(feedID).map(q => "%s: %s".format(q._1, q._2)).mkString("\n"))
+   // Ok(models.Statistics.getAverageDataStreamValues(feedID).map(q => "%s: %s".format(q._1, q._2)).mkString("\n"))
+    Ok("asdf")
   }
 
   def getMinMax(feedID: Int) = Action {
-    val min = models.Statistics.getminimumValues(feedID).map(q => "%s: %s".format(q._1, q._2)).mkString("\n")
-    val max = models.Statistics.getMaximumValues(feedID).map(q => "%s: %s".format(q._1, q._2)).mkString("\n")
-    Ok("Minimal: %s\nMaximum: %s".format(min, max))
+   // val min = models.Statistics.getminimumValues(feedID).map(q => "%s: %s".format(q._1, q._2)).mkString("\n")
+   // val max = models.Statistics.getMaximumValues(feedID).map(q => "%s: %s".format(q._1, q._2)).mkString("\n")
+    Ok("Minimal: %s\nMaximum: %s".format(0, 1))
   }
 
 
   def feeds(userID: Int) = Action.async {
     //Create tables
-    Await.result(models.Feeds.createTable, 5000 millis)
-    Await.result(models.Datastreams.createTable, 5000 millis)
-    Await.result(models.Userstates.createTable, 5000 millis)
+    //Await.result(models.Feeds.createTable, 5000 millis)
+    //Await.result(models.Datastreams.createTable, 5000 millis)
+    //Await.result(models.Userstates.createTable, 5000 millis)
     Feeds.getList.map(list => Ok(views.html.feeds(list, models.Login.getLoggedInUser(userID).APIKey)))
 
 
