@@ -16,6 +16,8 @@ import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
 import scala.concurrent.{Future, Await}
 import scala.concurrent.duration._
+import play.api.data._
+import play.api.data.Forms._
 
 
 object Application extends Controller {
@@ -23,12 +25,13 @@ object Application extends Controller {
 
   val factory: ConnectionFactory = new ConnectionFactory();
   factory.setHost("54.171.108.54");
-  val connection: Connectio
-
-  cluster.getMetadata.n = factory.newConnection()
+  val connection: Connection = factory.newConnection()
   val channel: Channel = connection.createChannel();
   channel.queueDeclare(QUEUE_NAME, true, false, false, null);*/
 
+  val newFeedform = Form(
+      "feedID" -> text
+  )
 
   def index = Action {
     if (models.Login.getLoggedInUser(0) != null)
@@ -45,7 +48,10 @@ object Application extends Controller {
       Unauthorized(views.html.unauthorized())
   }
 
-
+  def addFeed = Action { implicit request =>
+    val (newFeedID) = newFeedform.bindFromRequest.get
+    Ok("Hi %s %s".format(newFeedID))
+  }
 
   def createJsonFromDatastreams(feedID: Int, labels: Seq[String], data:util.ArrayList[List[Float]], timestamps: Seq[DateTime]): String = {
     val jsonObject = Json.toJson(

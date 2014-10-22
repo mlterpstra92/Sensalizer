@@ -6,36 +6,34 @@
 
 </div>
 <div class="modal-body">
-<table class="table table-bordered table-hover">
-    <tbody>
-        @if(feeds.length == 0) {
-            <p>You have no feeds :(</p>
-        } else {
-            @for(f <- feeds) {
-                <tr class="active">
-                    <td>
+    <table class="table table-bordered table-hover">
+        <tbody>
+            @if(feeds.length == 0) {
+                <p>You have no feeds :(</p>
+            } else {
+                @for(f <- feeds) {
+                    <tr class="active">
+                        <td>
                         @f.feedID
-                    </td>
-                    <td>
+                        </td>
+                        <td>
                         @f.title
-                    </td>
-                    <td>
-                        <button type="button" id="selectFeed" class="btn btn-primary btn-large" data-dismiss="modal">View feed</button>
-                    </td>
-                    <td style="display: none">
+                        </td>
+                        <td>
+                            <button type="button" id="selectFeed" class="btn btn-primary btn-large" data-dismiss="modal">View feed</button>
+                        </td>
+                        <td style="display: none">
                         @apiKey
-                    </td>
-                </tr>
+                        </td>
+                    </tr>
+                }
             }
-        }
-    </tbody>
-</table>
-    </div>
-   <div class="modal-footer">
-
-       <button type="button" class="btn btn-default" data-dismiss="modal">Add feed</button>
-       <button type="button" id="addfeed" class="btn btn-default" data-dismiss="modal">Close</button>
+        </tbody>
+    </table>
+</div>
+<div class="modal-footer">
+    <button type="button" class="btn btn-default"><a data-toggle="modal" href="@routes.Application.addFeed()" data-target="#profileModal">Add feed</a></button>
+    <button type="button" id="addfeed" class="btn btn-default" data-dismiss="modal">Close</button>
 
 
-   </div>
-
+</div>

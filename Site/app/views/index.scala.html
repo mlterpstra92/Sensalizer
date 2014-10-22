@@ -40,6 +40,25 @@
             <!-- /.modal-dialog -->
     </div>
 
+    <div class="modal fade" id="addFeedModal" role="dialog" tabindex="-1" aria-labelledby="addFeedModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h4 class="modal-title">Add Feed</h4>
+
+                </div>
+                <div class="modal-body"><div class="te"></div></div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary">Save</button>
+                </div>
+            </div>
+                <!-- /.modal-content -->
+        </div>
+            <!-- /.modal-dialog -->
+    </div>
+
     <div class="container">
         <div class="row clearfix">
             <div class="col-md-12 column">
@@ -57,7 +76,8 @@
                                         <a data-toggle="modal" href="@routes.Application.profile(userID)" data-target="#profileModal">Profile</a>
                                     </li>
                                     <li>
-                                        <a data-toggle="modal" href="@routes.Application.feeds(userID)" data-target="#feedModal">Feed management</a>                                    </li>
+                                        <a data-toggle="modal" href="@routes.Application.feeds(userID)" data-target="#feedModal">Feed management</a>
+                                    </li>
                                     <li class="divider">
                                     </li>
                                     <li>
@@ -69,11 +89,7 @@
                     </div>
 
                 </nav>
-                <!--<div class="jumbotron" id="feedView">
-                    <div class="container-canvas">
-                        <canvas id="feedGraph" width="800px" height="480px"></canvas>
-                    </div>
-                </div>-->
+
                 <div class="jumbotron">
                     <div class="row">
                         <div id="canvasContainer" class="col-md-12">
@@ -98,7 +114,7 @@
                                                 <input type="checkbox" checked><span class="lbl"> All</span>
                                             </a></li>
                                             <li class="divider"></li>
-                                            <!--<li><a href="#">
+                                                <!--<li><a href="#">
                                                 <input type="checkbox">
                                                 <span class="lbl"> Monday</span>
                                             </a></li>
@@ -131,10 +147,10 @@
                                 </div>
                                 <div class="checkbox" id="liveDataDiv">
                                     <label>
-                                        <input type="checkbox" checked id="liveData">Live data</label>
+                                        <input type="checkbox" checked id="liveData">Live data
+                                    </label>
                                 </div>
                             </form>
-
                         </div>
                     </div> <!-- /row -->
                 </div>
