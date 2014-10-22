@@ -21,13 +21,13 @@ import play.api.data.Forms._
 
 
 object Application extends Controller {
-  /*val QUEUE_NAME = "sensalizer"
+  val QUEUE_NAME = "sensalizer"
 
   val factory: ConnectionFactory = new ConnectionFactory();
-  factory.setHost("54.171.108.54");
+  factory.setHost("54.171.159.157");
   val connection: Connection = factory.newConnection()
   val channel: Channel = connection.createChannel();
-  channel.queueDeclare(QUEUE_NAME, true, false, false, null);*/
+  channel.queueDeclare(QUEUE_NAME, true, false, false, null);
 
   val newFeedform = Form(
       "feedID" -> text
@@ -124,7 +124,7 @@ object Application extends Controller {
             })
             val timestamps = Await.result(models.Datastreams.getInsertionTimes(feedIDStr.toInt), 2 seconds).toList.distinct
             println(createJsonFromDatastreams(feedIDStr.toInt, labels, dataValues, timestamps))
-            //channel.basicPublish("", QUEUE_NAME, null, createJsonFromDatastreams(feedIDStr.toInt, labels, dataValues, timestamps).getBytes())
+            channel.basicPublish("", QUEUE_NAME, null, createJsonFromDatastreams(feedIDStr.toInt, labels, dataValues, timestamps).getBytes())
           }
         }
       case None => Application.Status(418);
@@ -140,6 +140,7 @@ object Application extends Controller {
         val msg = new String(message.getPayload)
         message.ack()
         val json: JsValue = Json.parse(msg)
+        println(json)
         val label = DateTime.parse((json \ "updated").as[String])
         val newJson = Json.stringify(Json.toJson(
           Map(
@@ -156,7 +157,7 @@ object Application extends Controller {
             label)
           models.Datastreams.insertNewRecord(ds)
         }
-       // channel.basicPublish("", QUEUE_NAME, null, newJson.getBytes)
+        channel.basicPublish("", QUEUE_NAME, null, newJson.getBytes)
       }
     })
 
