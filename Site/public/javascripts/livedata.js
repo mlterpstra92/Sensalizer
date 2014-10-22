@@ -112,6 +112,7 @@ $(document ).ready(function() {
                 showTooltips: true,
                 datasetFill: false,
                 datasetStroke: false,
+                multiTooltipTemplate: "<%= value.toFixed(3) %>",
                 label: {format: 'shortTime'},
                 legendTemplate : '<ul id="legend">'
                     +'<% for (var i=0; i<datasets.length; i++) { %>'
@@ -205,6 +206,7 @@ $(document ).ready(function() {
                             chart.addData(data.current_value, timeString);
                         }
                     }
+                    console.log(chart)
                     chart.update();
                 });
             };
