@@ -23,7 +23,9 @@ object Application extends Controller {
 
   val factory: ConnectionFactory = new ConnectionFactory();
   factory.setHost("54.171.108.54");
-  val connection: Connection = factory.newConnection()
+  val connection: Connectio
+
+  cluster.getMetadata.n = factory.newConnection()
   val channel: Channel = connection.createChannel();
   channel.queueDeclare(QUEUE_NAME, true, false, false, null);*/
 

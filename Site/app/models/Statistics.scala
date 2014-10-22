@@ -9,7 +9,7 @@ case class Statistics(feedID: Int) {
 object Statistics {
 
   val conf = new SparkConf(true)
-    .set("spark.cassandra.connection.host", MyDBConnector.ip)
+    .set("spark.cassandra.connection.host", "54.171.162.102")
     .set("spark.eventLog.enabled", true.toString)
     .set("spark.eventLog.dir", "sparklogs")
     .setAppName("sensalizer")
