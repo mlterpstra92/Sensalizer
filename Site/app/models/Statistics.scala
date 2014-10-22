@@ -9,12 +9,12 @@ case class Statistics(feedID: Int) {
 object Statistics {
 
   val conf = new SparkConf(true)
-    .set("spark.cassandra.connection.host", "54.171.162.102")
+    .set("spark.cassandra.connection.host", "54.171.11.163")
     .set("spark.eventLog.enabled", true.toString)
     .set("spark.eventLog.dir", "sparklogs")
     .setAppName("sensalizer")
     //.setMaster("local")
-    .setMaster("spark://ec2-54-77-214-128.eu-west-1.compute.amazonaws.com:7077")
+    .setMaster("spark://ec2-54-171-159-155.eu-west-1.compute.amazonaws.com:7077")
     .setSparkHome("/root/spark")
 
 

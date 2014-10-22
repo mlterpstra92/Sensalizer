@@ -70,6 +70,17 @@ $(document ).ready(function() {
         return result;
     };
 
+    function generateGUID() {
+        var result, i, j;
+        result = '';
+        for(j=0; j<32; j++) {
+            if( j == 8 || j == 12|| j == 16|| j == 20)
+                result = result + '-';
+            i = Math.floor(Math.random()*16).toString(16).toUpperCase();
+            result = result + i;
+        }
+        return result;
+    }
 
 
     //Apparently, we eat click events, so use event delegation
@@ -79,13 +90,14 @@ $(document ).ready(function() {
 
         }
         if (e.currentTarget.id == "selectFeed") {
+            var guid = generateGUID();
             var feedID = $(this).parent().parent().find('td')[0].innerHTML.trim();
             var apiKey = $(this).parent().parent().find('td')[3].innerHTML.trim();
             console.log(apiKey);
             $.ajax({
                 type: "POST",
                 url: "triggerFeed",
-                data: {feedid: feedID, apikey: apiKey},
+                data: {feedid: feedID, apikey: apiKey, guid: guid},
                 success: function(a){
                     console.log("cool");
                 }
@@ -129,7 +141,7 @@ $(document ).ready(function() {
             var chart = null;
 
             var on_connect = function(x) {
-                id = client.subscribe("/queue/sensalizer", function(m) {
+                id = client.subscribe("/queue/"+guid, function(m){
                     // reply by sending the reversed text to the temp queue defined in the "reply-to" header
                     // console.log("SUCCESS!");
                     var data = JSON.parse(m.body);

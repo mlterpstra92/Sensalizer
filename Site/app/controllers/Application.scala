@@ -23,10 +23,10 @@ import play.api.data.Forms._
 object Application extends Controller {
   val QUEUE_NAME = "sensalizer"
 
-  val factory: ConnectionFactory = new ConnectionFactory();
-  factory.setHost("54.171.159.157");
+  val factory: ConnectionFactory = new ConnectionFactory()
+  factory.setHost("54.171.159.157")
   val connection: Connection = factory.newConnection()
-  val channel: Channel = connection.createChannel();
+  val channel: Channel = connection.createChannel()
   channel.queueDeclare(QUEUE_NAME, true, false, false, null);
 
   val newFeedform = Form(
@@ -109,26 +109,36 @@ object Application extends Controller {
   def triggerFeed = Action { request =>
     var feedIDStr: String = null
     var apiKeyStr: String = null
-    val data = request.body.asFormUrlEncoded match{
-      case Some(map) =>
-        map.get("apikey") match{
+    var clientGUID: String = null
+    val data = request.body.asFormUrlEncoded match {
+      case Some(map) => {
+        map.get("apikey") match {
           case Some(apikey) => apiKeyStr = apikey.apply(0);
+          case None => throw new Exception("Invalid form data: no APIkey")
         }
-        map.get("feedid") match{
-          case Some(feedID) => {
-            feedIDStr = feedID.apply(0)
-            val labels = Await.result(models.Datastreams.getDatastreamIDs(feedIDStr.toInt), 2 seconds).distinct.toList
-            val dataValues: util.ArrayList[List[Float]] = new util.ArrayList[List[Float]];
-            labels.map(label => {
-              val List: List[Float] = Await.result(models.Datastreams.getDataValueByStreamID(feedIDStr.toInt, label), 1500 millis).toList
-              dataValues.add(List)
-            })
-            val timestamps = Await.result(models.Datastreams.getInsertionTimes(feedIDStr.toInt), 2 seconds).toList.distinct
-            println(createJsonFromDatastreams(feedIDStr.toInt, labels, dataValues, timestamps))
-            channel.basicPublish("", QUEUE_NAME, null, createJsonFromDatastreams(feedIDStr.toInt, labels, dataValues, timestamps).getBytes())
-          }
+        map.get("feedid") match {
+          case Some(feedID) => feedIDStr = feedID.apply(0)
+          case None => throw new Exception("Invalid form data: no FeedID")
         }
-      case None => Application.Status(418);
+        map.get("guid") match {
+          case Some(guid) => clientGUID = guid.apply(0)
+          case None => throw new Exception("Invalid form data: no GUID")
+        }
+
+        //channel.exchangeDeclare(clientGUID, "", true)
+
+        val labels = Await.result(models.Datastreams.getDatastreamIDs(feedIDStr.toInt), 2 seconds).distinct.toList
+        val dataValues: util.ArrayList[List[Float]] = new util.ArrayList[List[Float]];
+        labels.map(label => {
+          val List: List[Float] = Await.result(models.Datastreams.getDataValueByStreamID(feedIDStr.toInt, label), 1500 millis).toList
+          dataValues.add(List)
+        })
+        val timestamps = Await.result(models.Datastreams.getInsertionTimes(feedIDStr.toInt), 2 seconds).toList.distinct
+        println(createJsonFromDatastreams(feedIDStr.toInt, labels, dataValues, timestamps))
+        channel.basicPublish("", clientGUID, null, createJsonFromDatastreams(feedIDStr.toInt, labels, dataValues, timestamps).getBytes())
+
+      }
+      case None => throw new Exception("Invalid form data: No form data")
     }
 
     println("Pushed db messages")
@@ -158,7 +168,7 @@ object Application extends Controller {
             label)
           models.Datastreams.insertNewRecord(ds)
         }
-        channel.basicPublish("", QUEUE_NAME, null, newJson.getBytes)
+        channel.basicPublish("", clientGUID, null, newJson.getBytes)
       }
     })
 
@@ -179,7 +189,8 @@ object Application extends Controller {
   def getMinMax(feedID: Int) = Action {
    // val min = models.Statistics.getminimumValues(feedID).map(q => "%s: %s".format(q._1, q._2)).mkString("\n")
    // val max = models.Statistics.getMaximumValues(feedID).map(q => "%s: %s".format(q._1, q._2)).mkString("\n")
-    Ok("Minimal: %s\nMaximum: %s".format(0, 1))
+    //Ok("Minimal: %s\nMaximum: %s".format(min, max))
+    Ok("Minimal: %s\nMaximum: %s".format(0,1))
   }
 
 
