@@ -2,7 +2,7 @@ package controllers
 
 import java.util
 
-import com.rabbitmq.client.{QueueingConsumer, ConnectionFactory, Connection, Channel}
+import com.rabbitmq.client._
 import org.fusesource.mqtt.client.{Topic, BlockingConnection, MQTT, QoS}
 
 import com.websudos.phantom.Implicits._
@@ -27,7 +27,8 @@ object Application extends Controller {
   factory.setHost("54.171.159.157")
   val connection: Connection = factory.newConnection()
   val channel: Channel = connection.createChannel()
-  channel.queueDeclare(QUEUE_NAME, true, false, true, null)
+  channel.exchangeDeclare("amq.topic", "topic", true, false, null)
+  //channel.queueDeclare(QUEUE_NAME, true, false, true, null)
 
   val newFeedform = Form(
       "feedID" -> text
@@ -125,7 +126,11 @@ object Application extends Controller {
           case None => throw new Exception("Invalid form data: no GUID")
         }
 
-        //channel.exchangeDeclare(clientGUID, "", true)
+          val queueName = channel.queueDeclare().getQueue
+          channel.queueBind(queueName, "amq.topic", clientGUID)
+          //channel.basicPublish("myAwesomeExchange", "someRoutingKey",false, false, MessageProperties.TEXT_PLAIN, "Hello World!".getBytes())
+
+
 
         val labels = Await.result(models.Datastreams.getDatastreamIDs(feedIDStr.toInt), 2 seconds).distinct.toList
         val dataValues: util.ArrayList[List[Float]] = new util.ArrayList[List[Float]];
@@ -135,8 +140,7 @@ object Application extends Controller {
         })
         val timestamps = Await.result(models.Datastreams.getInsertionTimes(feedIDStr.toInt), 2 seconds).toList.distinct
         println(createJsonFromDatastreams(feedIDStr.toInt, labels, dataValues, timestamps))
-        channel.basicPublish("", clientGUID, null, createJsonFromDatastreams(feedIDStr.toInt, labels, dataValues, timestamps).getBytes())
-
+        channel.basicPublish("amq.topic", clientGUID, null, createJsonFromDatastreams(feedIDStr.toInt, labels, dataValues, timestamps).getBytes)
       }
       case None => throw new Exception("Invalid form data: No form data")
     }
@@ -168,7 +172,7 @@ object Application extends Controller {
             label)
           models.Datastreams.insertNewRecord(ds)
         }
-        channel.basicPublish("", clientGUID, null, newJson.getBytes)
+        channel.basicPublish("amq.topic", clientGUID, null, newJson.getBytes)
       }
     })
 

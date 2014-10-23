@@ -94,6 +94,7 @@ $(document ).ready(function() {
             var feedID = $(this).parent().parent().find('td')[0].innerHTML.trim();
             var apiKey = $(this).parent().parent().find('td')[3].innerHTML.trim();
             console.log(apiKey);
+            console.log(guid);
             $.ajax({
                 type: "POST",
                 url: "triggerFeed",
@@ -142,10 +143,12 @@ $(document ).ready(function() {
             var chart = null;
 
             var on_connect = function(x) {
-                id = client.subscribe("/queue/"+guid, function(m){
+                //id = client.subscribe("/queue/"+guid, function(m){
+                id = client.subscribe("/topic/"+guid, function(m){
                     // reply by sending the reversed text to the temp queue defined in the "reply-to" header
                     // console.log("SUCCESS!");
                     var data = JSON.parse(m.body);
+                    //client.ack(m);
                     if (first) {
                         console.log(data);
                         if (data && data.datasets) {
@@ -206,9 +209,9 @@ $(document ).ready(function() {
                             chart.addData(data.current_value, timeString);
                         }
                     }
-                    console.log(chart)
+                    console.log(chart);
                     chart.update();
-                }, {ack: true});
+                });
             };
             var on_error =  function() {
                 console.log('error');
