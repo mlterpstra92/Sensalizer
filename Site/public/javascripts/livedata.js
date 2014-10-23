@@ -208,7 +208,7 @@ $(document ).ready(function() {
                     }
                     console.log(chart)
                     chart.update();
-                });
+                }, {ack: true});
             };
             var on_error =  function() {
                 console.log('error');

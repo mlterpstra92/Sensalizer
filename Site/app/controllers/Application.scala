@@ -27,7 +27,7 @@ object Application extends Controller {
   factory.setHost("54.171.159.157")
   val connection: Connection = factory.newConnection()
   val channel: Channel = connection.createChannel()
-  channel.queueDeclare(QUEUE_NAME, true, false, false, null);
+  channel.queueDeclare(QUEUE_NAME, true, false, true, null)
 
   val newFeedform = Form(
       "feedID" -> text
