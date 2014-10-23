@@ -14,7 +14,7 @@ object Statistics {
     .set("spark.eventLog.dir", "sparklogs")
     .setAppName("sensalizer")
     //.setMaster("local")
-    .setMaster("spark://ec2-54-171-159-155.eu-west-1.compute.amazonaws.com:7077")
+    .setMaster("spark://ec2-54-171-179-206.eu-west-1.compute.amazonaws.com:7077")
     .setSparkHome("/root/spark")
 
 
