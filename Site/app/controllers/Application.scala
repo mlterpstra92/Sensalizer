@@ -11,7 +11,7 @@ import play.api.libs.iteratee.{Enumerator, Iteratee, Concurrent}
 import org.joda.time.DateTime
 import play.api.libs.json._
 import play.api.mvc._
-//import models.Statistics._
+import models.Statistics._
 import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
 import scala.concurrent.{Future, Await}
@@ -28,7 +28,6 @@ object Application extends Controller {
   val connection: Connection = factory.newConnection()
   val channel: Channel = connection.createChannel()
   channel.exchangeDeclare("amq.topic", "topic", true, false, null)
-  //channel.queueDeclare(QUEUE_NAME, true, false, true, null)
 
   val newFeedform = Form(
       "feedID" -> text
@@ -186,15 +185,15 @@ object Application extends Controller {
   }
 
   def getAverages(feedID: Int) = Action {
-   // Ok(models.Statistics.getAverageDataStreamValues(feedID).map(q => "%s: %s".format(q._1, q._2)).mkString("\n"))
-    Ok("asdf")
+    Ok(models.Statistics.getAverageDataStreamValues(feedID).map(q => "%s: %s".format(q._1, q._2)).mkString("\n"))
+   // Ok("asdf")
   }
 
   def getMinMax(feedID: Int) = Action {
-   // val min = models.Statistics.getminimumValues(feedID).map(q => "%s: %s".format(q._1, q._2)).mkString("\n")
-   // val max = models.Statistics.getMaximumValues(feedID).map(q => "%s: %s".format(q._1, q._2)).mkString("\n")
-    //Ok("Minimal: %s\nMaximum: %s".format(min, max))
-    Ok("Minimal: %s\nMaximum: %s".format(0,1))
+    val min = models.Statistics.getminimumValues(feedID).map(q => "%s: %s".format(q._1, q._2)).mkString("\n")
+    val max = models.Statistics.getMaximumValues(feedID).map(q => "%s: %s".format(q._1, q._2)).mkString("\n")
+    Ok("Minimal: %s\nMaximum: %s".format(min, max))
+    //Ok("Minimal: %s\nMaximum: %s".format(0,1))
   }
 
 
