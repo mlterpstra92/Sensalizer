@@ -1,7 +1,7 @@
 package models
 
 import java.util.UUID
-
+import org.joda.time.{DateTimeComparator, DateTime}
 import com.datastax.driver.core.{ResultSet, Row}
 import com.websudos.phantom.CassandraTable
 import com.websudos.phantom.Implicits._
@@ -56,5 +56,10 @@ object Feeds extends Feeds with MyDBConnector {
 
   def getList: Future[Seq[Feed]] = {
     select.fetch
+  }
+
+  def createFeed(feedName: String, feedID: Int): Feed = {
+    val newFeed = new Feed(feedID, feedName, true, "https://api.xively.com/v2/feeds/"+feedID, DateTime.now(), DateTime.now(), "https://xively.com/user/Sensalizer", "1.0.0")
+    return newFeed
   }
 }
