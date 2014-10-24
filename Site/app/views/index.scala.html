@@ -100,33 +100,27 @@
 
                 <div class="jumbotron">
                     <div class="row">
-                        <div id="canvasContainer" class="col-md-12">
+                        <div id="canvasContainer" class="col-md-11">
                             <canvas id="feedGraph" width="300" height="300">
                                 Sorry, your browser doesn't support the &lt;canvas&gt; element.
                             </canvas>
                             <form id="graphModForm" class="form-inline" role="form">
                                 <div class="form-group">
-                                    <div>
-                                        <label>Number of datapoints</label>
-                                        <input type="number" class="form-control" id="numDataPoints" value = "10" placeholder="10">
-                                    </div>
-                                    <div>
-                                        <button type="button" class="form-control" id="applyNumLim"> Apply </button>
-
-                                    </div>
-                                </div>
-                                <div class="input-group">
-                                    <div class="input-group-btn">
-                                        <button tabindex="-1" class="btn btn-default" type="button">Active data</button>
-                                        <button tabindex="-1" data-toggle="dropdown" class="btn btn-default dropdown-toggle" type="button">
-                                            <span class="caret"></span>
-                                        </button>
-                                        <ul role="menu" class="dropdown-menu">
-                                            <li><a href="#">
-                                                <input type="checkbox" checked><span class="lbl"> All</span>
-                                            </a></li>
-                                            <li class="divider"></li>
-                                                <!--<li><a href="#">
+                                    <label>Number of datapoints</label>
+                                    <input type="number" class="form-control input-small" id="numDataPoints" value = "10" placeholder="10">
+                                    <button type="button" class="form-control btn-sm" id="applyNumLim">Apply</button>
+                                    <div class="input-group" class="col-xs-4">
+                                        <div class="input-group-btn">
+                                            <button tabindex="-1" class="btn btn-default" type="button">Active data</button>
+                                            <button tabindex="-1" data-toggle="dropdown" class="btn btn-default dropdown-toggle" type="button">
+                                                <span class="caret"></span>
+                                            </button>
+                                            <ul role="menu" class="dropdown-menu">
+                                                <li><a href="#">
+                                                    <input type="checkbox" checked><span class="lbl"> All</span>
+                                                </a></li>
+                                                <li class="divider"></li>
+                                                    <!--<li><a href="#">
                                                 <input type="checkbox">
                                                 <span class="lbl"> Monday</span>
                                             </a></li>
@@ -154,15 +148,19 @@
                                                 <input type="checkbox"><span class="lbl">
                                                 Sunday</span>
                                             </a></li>-->
-                                        </ul>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                    <div class="checkbox" id="liveDataDiv">
+                                        <label>
+                                            <input type="checkbox" checked id="liveData">Live data
+                                        </label>
                                     </div>
                                 </div>
-                                <div class="checkbox" id="liveDataDiv">
-                                    <label>
-                                        <input type="checkbox" checked id="liveData">Live data
-                                    </label>
-                                </div>
                             </form>
+                        </div>
+                        <div class="col-md-1">
+                            <div id="legend"></div>
                         </div>
                     </div> <!-- /row -->
                 </div>

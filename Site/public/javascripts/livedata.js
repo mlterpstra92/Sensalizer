@@ -18,6 +18,28 @@ $(document ).ready(function() {
     //Initial call
     respondCanvas();
 
+    //legend!
+    var options = {
+        responsive : true,
+        animation: false,
+        barValueSpacing : 5,
+        barDatasetSpacing : 1,
+        showTooltips: true,
+        datasetFill: false,
+        datasetStroke: false,
+        multiTooltipTemplate: "<%= value.toFixed(3) %>",
+        label: {format: 'shortTime'},
+        legendTemplate : '<ul id="legend">'
+            +'<% for (var i=0; i<datasets.length; i++) { %>'
+            +'<li id=\"li<%=i%>\">'
+            +'<% if (datasets[i].label) { %><%= datasets[i].label %><% } %>'
+            +'</li><br>'
+            +'<% } %>'
+            +'</ul>'
+    }
+
+    document.styleSheets[0].addRule('#legend','list-style: none', 'padding:0', 'margin:0');
+
     function padLeft(nr, n, str) {
         return Array(n - String(nr).length + 1).join(str || '0') + nr;
     }
@@ -86,20 +108,17 @@ $(document ).ready(function() {
     var cycle = 0;
     //Apparently, we eat click events, so use event delegation
     $(this).on('click', 'button', function (e) {
+        e.preventDefault();
 
         if (e.currentTarget.id == "applyNumLim"){
-            //console.log("Druk op de knop... Comm' on man doo itttt")
-
             var n = document.getElementById("numDataPoints").value;
 
             if (cycle > n){
                 cycle = n
             }
-            console.log(n)
+
             numDatapoints = n;
         }
-
-        e.preventDefault();
         if (e.currentTarget.id == "selectFeed") {
             var guid = generateGUID();
             var feedID = $(this).parent().parent().find('td')[0].innerHTML.trim();
@@ -114,34 +133,6 @@ $(document ).ready(function() {
                     console.log("cool");
                 }
             });
-
-            //legend!
-            var options = {
-                responsive : true,
-                animation: false,
-                barValueSpacing : 5,
-                barDatasetSpacing : 1,
-                showTooltips: true,
-                datasetFill: false,
-                datasetStroke: false,
-                multiTooltipTemplate: "<%= value.toFixed(3) %>",
-                label: {format: 'shortTime'},
-                legendTemplate : '<ul id="legend">'
-                    +'<% for (var i=0; i<datasets.length; i++) { %>'
-                    +'<li id=\"li<%=i%>\">'
-                    +'<% if (datasets[i].label) { %><%= datasets[i].label %><% } %>'
-                    +'</li>'
-                    +'<% } %>'
-                    +'</ul>'
-            }
-
-            //var chart = new Chart(ct).Line(d, options);
-            var legendHTML = document.getElementById("legend");
-            if (legendHTML)
-                legendHTML.innerHTML = chart.generateLegend();
-
-            document.styleSheets[0].addRule('#legend','list-style: none', 'padding:0','margin:0');
-
 
             var RabbitMQIP = "54.171.159.157";
             var ws = new SockJS('http://' + RabbitMQIP + ':15674/stomp');
@@ -165,8 +156,11 @@ $(document ).ready(function() {
                         if (data && data.datasets) {
                             var followers = [];
                             for (var j in data.datasets) {
-                                for (var q in data.datasets[j])
-                                    followers.push(data.datasets[j][q].data)
+                                var newData = [];
+                                for (var q in data.datasets[j]){
+                                    newData.push(data.datasets[j][q].data)
+                                }
+                                followers.push(newData)
                             }
                             //console.log(followers)
 
@@ -203,13 +197,15 @@ $(document ).ready(function() {
                                 'display: inline;' +
                                 'vertical-align: middle;' +
                                 'position: relative;' +
-                                'font-size: 3em;' +
+                                'font-size: 1em;' +
+                                'width: 40px' +
+                                'height: 40px' +
                                 'padding-right: 10px');
                         }
-                        //console.log(data);
 
                         chart = new Chart(ct).Line(data, options);
                         $("#graphModForm").show();
+                        document.getElementById("legend").innerHTML = chart.generateLegend();
                         first = false
                     }
                     else
@@ -230,8 +226,6 @@ $(document ).ready(function() {
                     }
                     cycle = cycle + 1;
                     chart.update();
-
-
                 });
             };
             var on_error =  function() {
