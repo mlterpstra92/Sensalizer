@@ -62,4 +62,8 @@ object Feeds extends Feeds with MyDBConnector {
     val newFeed = new Feed(feedID, feedName, true, "https://api.xively.com/v2/feeds/"+feedID, DateTime.now(), DateTime.now(), "https://xively.com/user/Sensalizer", "1.0.0")
     return newFeed
   }
+
+  def deleteUser(id: Int) = {
+    delete.where(_.feedID eqs id).future()
+  }
 }

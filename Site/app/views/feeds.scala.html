@@ -1,32 +1,5 @@
 @(feeds: Seq[Feed], apiKey: String)
 
-<div class="modal fade" id="addFeedModal" role="dialog" tabindex="-1" aria-labelledby="addFeedModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                <h4 class="modal-title">Add Feed</h4>
-
-            </div>
-            <div class="modal-body">
-                <div class="container">
-                    @helper.form(action = routes.Application.addFeed()) {
-                        <input type="text" name="feedName" class="input-block-level" placeholder="Choose name">
-                        <input type="number" name="feedID" class="input-block-level" placeholder="Input FeedID">
-                        <input class="btn btn-large btn-primary" type="submit" value="Add">
-                        }
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                    <!--<button type="submit" class="btn btn-primary">Add</button>-->
-            </div>
-        </div>
-            <!-- /.modal-content -->
-    </div>
-        <!-- /.modal-dialog -->
-</div>
-
 <div class="modal-header">
     <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
     <h4 class="modal-title">Feed Management</h4>
@@ -46,8 +19,9 @@
                         <td>
                         @f.title
                         </td>
-                        <td>
+                        <td align="right">
                             <button type="button" id="selectFeed" class="btn btn-primary btn-large" data-dismiss="modal">View feed</button>
+                            <button type="button" id="removeFeed" class="btn btn-danger btn-large">Delete</button>
                         </td>
                         <td style="display: none">
                         @apiKey
@@ -59,7 +33,6 @@
     </table>
 </div>
 <div class="modal-footer">
-    <a data-toggle="modal" href="#" data-target="#addFeedModal"><button type="button" class="btn btn-default">Add feed</button></a>
-    <button type="button" id="addfeed" class="btn btn-default" data-dismiss="modal">Close</button>
-
+    <a data-toggle="modal" href="#addFeedModal" class="btn btn-default">Add feed</a><!--data-target="#addFeedModal"-->
+    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
 </div>

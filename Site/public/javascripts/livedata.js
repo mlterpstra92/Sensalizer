@@ -100,9 +100,6 @@ $(document ).ready(function() {
         }
 
         e.preventDefault();
-        if (e.currentTarget.id == "addfeed"){
-
-        }
         if (e.currentTarget.id == "selectFeed") {
             var guid = generateGUID();
             var feedID = $(this).parent().parent().find('td')[0].innerHTML.trim();

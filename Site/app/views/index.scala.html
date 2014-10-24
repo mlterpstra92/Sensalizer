@@ -1,6 +1,33 @@
 @(userID: Int)
 
 @main("Sensalizer") {
+    <div class="modal fade" id="addFeedModal" role="dialog" tabindex="-1" aria-labelledby="addFeedModalLabel" aria-hidden="true" data-backdrop="static">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h4 class="modal-title">Add Feed</h4>
+
+                </div>
+                <div class="modal-body">
+                    <div class="container">
+                    @helper.form(action = routes.Application.addFeed()) {
+                        <input type="text" name="feedName" class="input-block-level" placeholder="Choose name">
+                        <input type="number" name="feedID" class="input-block-level" placeholder="Input FeedID">
+                        <input class="btn btn-large btn-primary" type="submit" value="Add">
+                        }
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                        <!--<button type="submit" class="btn btn-primary">Add</button>-->
+                </div>
+            </div>
+                <!-- /.modal-content -->
+        </div>
+            <!-- /.modal-dialog -->
+    </div>
+
     <div class="modal fade" id="feedModal" tabindex="-1" role="dialog" aria-labelledby="feedModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -11,7 +38,7 @@
                 </div>
                 <div class="modal-body"><div class="te"></div></div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <a data-toggle="modal" href="#addFeedModal" class="btn btn-default">Add feed</a>
                     <button type="button" class="btn btn-primary">Save changes</button>
                 </div>
             </div>
