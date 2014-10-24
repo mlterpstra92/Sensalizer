@@ -82,9 +82,23 @@ $(document ).ready(function() {
         return result;
     }
 
-
+    var numDatapoints = 10;
+    var cycle = 0;
     //Apparently, we eat click events, so use event delegation
     $(this).on('click', 'button', function (e) {
+
+        if (e.currentTarget.id == "applyNumLim"){
+            //console.log("Druk op de knop... Comm' on man doo itttt")
+
+            var n = document.getElementById("numDataPoints").value;
+
+            if (cycle > n){
+                cycle = n
+            }
+            console.log(n)
+            numDatapoints = n;
+        }
+
         e.preventDefault();
         if (e.currentTarget.id == "addfeed"){
 
@@ -129,7 +143,7 @@ $(document ).ready(function() {
             if (legendHTML)
                 legendHTML.innerHTML = chart.generateLegend();
 
-            document.styleSheets[0].addRule('#legend','list-style: none', 'padding:0', 'margin:0');
+            document.styleSheets[0].addRule('#legend','list-style: none', 'padding:0','margin:0');
 
 
             var RabbitMQIP = "54.171.159.157";
@@ -150,7 +164,7 @@ $(document ).ready(function() {
                     var data = JSON.parse(m.body);
                     //client.ack(m);
                     if (first) {
-                        console.log(data);
+                        //console.log(data);
                         if (data && data.datasets) {
                             var followers = [];
                             for (var j in data.datasets) {
@@ -160,7 +174,7 @@ $(document ).ready(function() {
                             //console.log(followers)
 
                             var res = sortMultipleArrays(data.labels, followers);
-                            //console.log(res);
+                            console.log(res);
                             data.labels = res.sorted;
                             var order = data.labels;
                             for (var z = 0; z < res.followed.length; ++z) {
@@ -174,6 +188,7 @@ $(document ).ready(function() {
                             for (var i in data.labels)
                                 data.labels[i] = new Date(data.labels[i]).toTimeString().split(' ')[0];
                         }
+                        console.log(data.labels)
                         data.datasets = data.datasets[0];
                         //add some colors, maximum of four. Add more if more datasets
 
@@ -194,7 +209,7 @@ $(document ).ready(function() {
                                 'font-size: 3em;' +
                                 'padding-right: 10px');
                         }
-                        console.log(data);
+                        //console.log(data);
 
                         chart = new Chart(ct).Line(data, options);
                         $("#graphModForm").show();
@@ -209,8 +224,17 @@ $(document ).ready(function() {
                             chart.addData(data.current_value, timeString);
                         }
                     }
-                    console.log(chart);
+                    //console.log(chart);
+
+                    console.log(cycle);
+
+                    if (cycle > numDatapoints){
+                        chart.removeData()
+                    }
+                    cycle = cycle + 1;
                     chart.update();
+
+
                 });
             };
             var on_error =  function() {
