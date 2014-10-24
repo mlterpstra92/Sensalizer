@@ -15,7 +15,6 @@ abstract case class Userstates extends CassandraTable[Userstates, Userstate]{
   }
   object username extends StringColumn(this)
   object APIkey extends StringColumn(this)
-
 }
 object Userstates extends Userstates with MyDBConnector {
   // you can even rename the table in the schema to whatever you like.

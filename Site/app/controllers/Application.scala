@@ -18,6 +18,10 @@ import scala.concurrent.{Future, Await}
 import scala.concurrent.duration._
 import play.api.data._
 import play.api.data.Forms._
+import play.api._
+import play.api.mvc._
+import play.api.data._
+import play.api.data.Forms._
 
 
 object Application extends Controller {
@@ -29,9 +33,21 @@ object Application extends Controller {
   val channel: Channel = connection.createChannel()
   channel.exchangeDeclare("amq.topic", "topic", true, false, null)
 
-  val newFeedform = Form(
-      "feedID" -> text
+  case class feedData(feedID: String)
+
+  val newFeedForm = Form(
+    tuple(
+      "feedName" -> nonEmptyText,
+      "feedID" -> number
+    )
   )
+
+  def addFeed = Action { implicit request =>
+    val (newFeedName, newFeedID) = newFeedForm.bindFromRequest.get
+    val newFeed = Feeds.createFeed(newFeedName, newFeedID)
+    Feeds.insertNewRecord(newFeed)
+    Redirect(routes.Application.index())
+  }
 
   def index = Action {
     if (models.Login.getLoggedInUser(0) != null)
@@ -47,12 +63,6 @@ object Application extends Controller {
     else
       Unauthorized(views.html.unauthorized())
   }
-
-  def addFeed = Action { implicit request =>
-    val (newFeedID) = newFeedform.bindFromRequest.get
-    Ok("Hi %s %s".format(newFeedID))
-  }
-
 
   def createJsonFromDatastreams(feedID: Int, labels: Seq[String], data:util.ArrayList[List[Float]], timestamps: Seq[DateTime]): String = {
     val jsonObject = Json.toJson(

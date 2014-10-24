@@ -22,10 +22,9 @@ import scala.concurrent.{Future, blocking}
 
 object MyDBConnector {
   val keySpace = "sensalizer"
-  val ip = "54.171.159.157,54.171.11.163,54.171.159.183"
 
-  lazy val cluster =  Cluster.builder()
-    .addContactPoints("54.171.159.157","54.171.11.163","54.171.159.183")
+  lazy val cluster = Cluster.builder()
+    .addContactPoints("54.77.184.240","54.171.11.163","54.171.159.183")
     .withPort(9042)
     .withoutJMXReporting()
     .withoutMetrics()
