@@ -21,7 +21,7 @@ libraryDependencies ++= Seq(
   "org.apache.spark" %% "spark-core" % "1.1.0",
   "org.apache.spark" %% "spark-sql" % "1.1.0",
   "org.apache.spark" %% "spark-streaming" % "1.1.0",
-  "com.datastax.spark" %% "spark-cassandra-connector" % "1.1.0-alpha3" withSources() withJavadoc(),
+  "com.datastax.spark" %% "spark-cassandra-connector" % "1.1.0-alpha4" withSources() withJavadoc(),
   "com.typesafe.akka" %% "akka-actor" % "2.2.3",
   "com.typesafe.akka" %% "akka-slf4j" % "2.2.3"
   //"com.tuplejump" %% "calliope-sql" % "1.1.0-CTP-U2"
