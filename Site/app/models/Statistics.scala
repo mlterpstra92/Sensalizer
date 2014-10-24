@@ -38,8 +38,8 @@ object Statistics {
 
   def getMaximumValues(feedID: Int): Array[(String ,Float)] =
   {
-    sc.cassandraTable("sensalizer", "datastreams").where("feedid = ?", feedID).map(i => (i.getString("streamid"), i.getFloat("currentvalue"))).groupBy(_._1).map(i => (i._1, i._2.map(z => z._2).toList.max)).collect()
-    //Array(("sadf", 234f))
+    //sc.cassandraTable("sensalizer", "datastreams").where("feedid = ?", feedID).map(i => (i.getString("streamid"), i.getFloat("currentvalue"))).groupBy(_._1).map(i => (i._1, i._2.map(z => z._2).toList.max)).collect()
+    Array(("sadf", 234f))
 
   }
   def getminimumValues(feedID: Int): Array[(String ,Float)] =
