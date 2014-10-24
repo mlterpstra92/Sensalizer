@@ -12,6 +12,7 @@ object Statistics {
     .set("spark.cassandra.connection.host", "54.171.11.163")
     .set("spark.eventLog.enabled", true.toString)
     .set("spark.eventLog.dir", "sparklogs")
+    .set("spark.executor.extraClassPath", "/root/spark/jars/spark-cassandra-connector_2.10-1.1.0-alpha4.jar:/root/spark/jars/cassandra-all-2.1.0.jar:/root/spark/jars/cassandra-thrift-2.1.0.jar:/root/spark/jars/libthrift-0.9.1.jar:/root/spark/jars/cassandra-driver-core-2.1.2.jar:/root/spark/jars/lz4-1.2.0.jar")
     .setAppName("sensalizer")
     //.setMaster("local")
     .setMaster("spark://ec2-54-171-179-206.eu-west-1.compute.amazonaws.com:7077")
