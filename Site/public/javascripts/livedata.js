@@ -104,6 +104,15 @@ $(document ).ready(function() {
         return result;
     }
 
+    var resetCanvas = function(){
+        var canvas = $('#feedGraph');
+        canvas.remove();
+        $('#canvasContainer').append('<canvas id="feedGraph" width="300" height="300"></canvas>');
+
+        ct = canvas.get(0).getContext('2d');
+        respondCanvas();
+    };
+
     var numDatapoints = 10;
     var cycle = 0;
     //Apparently, we eat click events, so use event delegation
@@ -120,6 +129,7 @@ $(document ).ready(function() {
             numDatapoints = n;
         }
         if (e.currentTarget.id == "selectFeed") {
+            resetCanvas();
             var guid = generateGUID();
             var feedID = $(this).parent().parent().find('td')[0].innerHTML.trim();
             var apiKey = $(this).parent().parent().find('td')[3].innerHTML.trim();
