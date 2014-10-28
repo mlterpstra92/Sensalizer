@@ -1,9 +1,6 @@
 package models
 
 import java.util.concurrent.TimeoutException
-
-import play.api.mvc.AsyncResult
-
 import scala.concurrent._
 import com.websudos.phantom.Implicits._
 import scala.concurrent.duration._

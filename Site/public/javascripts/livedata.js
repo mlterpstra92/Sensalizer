@@ -129,7 +129,8 @@ $(document ).ready(function() {
             numDatapoints = n;
         }
         if (e.currentTarget.id == "selectFeed") {
-            resetCanvas();
+            if (chart)
+                resetCanvas();
             var guid = generateGUID();
             var feedID = $(this).parent().parent().find('td')[0].innerHTML.trim();
             var apiKey = $(this).parent().parent().find('td')[3].innerHTML.trim();

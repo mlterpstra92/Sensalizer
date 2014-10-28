@@ -8,7 +8,7 @@ case class Statistics(feedID: Int) {
 }
 object Statistics {
 
-  val conf = new SparkConf(true)
+  //val conf = new SparkConf(true)
     /*
     .set("spark.cassandra.connection.host", "54.171.11.163")
     .set("spark.eventLog.enabled", true.toString)
@@ -18,15 +18,16 @@ object Statistics {
     //.setMaster("local")
     .setMaster("spark://ec2-54-171-179-206.eu-west-1.compute.amazonaws.com:7077")
     .setSparkHome("/root/spark")
-*/
+
 
   //val ssc = new StreamingContext(conf, Seconds(2))
   val sc = new SparkContext("spark://ec2-54-171-179-206.eu-west-1.compute.amazonaws.com:7077", "sensalizer", conf)
-  sc.addJar("jars/spark-cassandra-connector-assembly-1.2.0-SNAPSHOT.jar")
+  sc.addJar("jars/spark-cassandra-connector-assembly-1.2.0-SNAPSHOT.jar")*/
 
+  val conf = new SparkConf().setAppName("sensalizer").setMaster("spark://ec2-54-171-164-152.eu-west-1.compute.amazonaws.com:7077")
+  val sc = new SparkContext(conf)
 
-
-  val myTable = sc.cassandraTable("sensalizer", "datastreams")
+  //val myTable = sc.cassandraTable("sensalizer", "datastreams")
 
 
   def calcAvg(list: List[Float]): Float = {
@@ -35,7 +36,9 @@ object Statistics {
   def getAverageDataStreamValues(feedID: Int): Array[(String, Float)] =
   {
     //ssc.cassandraTable("sensalizer", "datastreams").where("feedid = ?", feedID).map(i => (i.getString("streamid"), i.getFloat("currentvalue"))).groupBy(_._1).map(i => (i._1, calcAvg(i._2.map(z => z._2).toList))).collect()
-      Array(("sadf", myTable.count().toFloat))
+    // Array(("sadf", myTable.count().toFloat))
+    val data = Array(1.0f, 2.0f, 3.0f)
+    Array(("asdf", sc.parallelize(data).map(x => x / data.length).collect().sum))
   }
 
   def getMaximumValues(feedID: Int): Array[(String ,Float)] =

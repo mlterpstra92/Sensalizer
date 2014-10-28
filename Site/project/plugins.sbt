@@ -4,4 +4,4 @@ resolvers += "Typesafe repository" at "http://repo.typesafe.com/typesafe/release
 
 resolvers += "Websudos releases" at "http://maven.websudos.co.uk/ext-release-local"
 
-addSbtPlugin("com.typesafe.play" % "sbt-plugin" % "2.2.1")
+addSbtPlugin("com.typesafe.play" % "sbt-plugin" % "2.3.6")
