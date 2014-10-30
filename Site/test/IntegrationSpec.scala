@@ -19,7 +19,7 @@ class IntegrationSpec extends Specification {
 
       browser.goTo("http://localhost:9000")
 
-      browser.pageSource must contain("Sensalizer")
+      browser.pageSource must contain("html")
     }
   }
 }

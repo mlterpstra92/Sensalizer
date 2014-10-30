@@ -12,14 +12,25 @@ import com.websudos.phantom.iteratee.Iteratee
 import org.joda.time.DateTime
 import scala.concurrent.{Await, Future}
 
-abstract case class Datastreams extends CassandraTable[Datastreams, Datastream]{
+
+case class Datastream(
+                       feedID: Int,
+                       streamID: String,
+                       currentValue: Float,
+                       insertionTime: DateTime)
+
+object Datastream {
+  implicit def dateTimeOrdering[A <: Datastream]: Ordering[A] = Ordering.fromLessThan(_.insertionTime isBefore _.insertionTime)
+}
+
+abstract case class Datastreams() extends CassandraTable[Datastreams, Datastream]{
   object feedID extends IntColumn(this) with PartitionKey[Int]
   object streamID extends StringColumn(this) with PrimaryKey[String] with ClusteringOrder[String] with Descending
   object currentValue extends FloatColumn(this)
   object insertionTime extends DateTimeColumn(this) with PrimaryKey[DateTime] with ClusteringOrder[DateTime] with Descending
 
 }
-object Datastreams extends Datastreams with MyDBConnector {
+object Datastreams extends Datastreams with CassandraConnector {
   // you can even rename the table in the schema to whatever you like.
   override lazy val tableName = "datastreams"
 
@@ -37,7 +48,7 @@ object Datastreams extends Datastreams with MyDBConnector {
       .future()
   }
 
-  override def fromRow(r: Row): Datastream = Datastream(feedID(r), streamID(r), currentValue(r), insertionTime(r));
+  override def fromRow(r: Row): Datastream = Datastream(feedID(r), streamID(r), currentValue(r), insertionTime(r))
   // now you have the full power of Cassandra in really cool one liners.
   // The future will do all the heavy lifting for you.
   // If there is an error you get a failed Future.
@@ -54,61 +65,7 @@ object Datastreams extends Datastreams with MyDBConnector {
     select(_.currentValue).where(_.feedID eqs feedID).and(_.streamID eqs streamID).fetch()
   }
 
-  def getLatestInsertionTime(feedID: Int): Future[Option[DateTime]] = {
-    select(_.insertionTime).where(_.feedID eqs feedID).one()
-  }
-
   def getInsertionTimes(feedID: Int): Future[Seq[DateTime]] = {
     select(_.insertionTime).where(_.feedID eqs feedID).fetch
   }
-
-
-  /*
-      // Because you are using a partition key, you can successfully using ordering
-      // And you can pagina}te your records.
-      // That's it, a really cool one liner.
-      // The fetch method will collect an asynchronous lazy iterator into a Seq.
-      // It's a good way to avoid boilerplate when retrieving a small number of items.
-      def getDatastreamsPage(start: UUID, limit: Int): ScalaFuture[Seq[Datastream]] = {
-        select.where(_.id gtToken start).limit(limit).fetch()
-
-
-
-      // The fetchEnumerator method is the real power behind the scenes.
-      // You can retrieve a whole table, even with billions of records, in a single query.
-      // Phantom will collect them into an asynchronous, lazy iterator with very low memory foot print.
-      // Enumerators, iterators and iteratees are based on Play iteratees.
-      // You can keep the async behaviour or collect through the Iteratee.
-      def getEntireTable: ScalaFuture[Seq[Datastream]] = {
-        select.fetchEnumerator() run Iteratee.collect()
-      }
-
-
-      // com.websudos.phantom supports a few more Iteratee methods.
-      // However, if you are looking to guarantee ordering and paginate "the old way"
-      // You need an OrderPreservingPartitioner.
-      def getDatastreamPage(start: Int, limit: Int): ScalaFuture[Iterator[Datastream]] = {
-        select.fetchEnumerator() run Iteratee.slice(start, limit)
-      }
-
-
-      // Updating records is also really easy.
-      // Updating one record is done like this
-      def updateDatastreamAuthor(id: UUID, author: String): ScalaFuture[ResultSet] = {
-        update.where(_.id eqs id).modify(_.author setTo author).future()
-      }
-
-      // Updating records is also really easy.
-      // Updating multiple fields at the same time is also easy.
-      def updateDatastreamAuthorAndName(id: UUID, name: String, author: String): ScalaFuture[ResultSet] = {
-        update.where(_.id eqs id).modify(_.name setTo name)
-          .and(_.author setTo author)
-          .future()
-      }
-
-      // Deleting records has the same restrictions and selecting.
-      // If something is non primary, you cannot have it in a where clause.
-      def deleteDatastreamById(id: UUID): ScalaFuture[ResultSet] = {
-        delete.where(_.id eqs id).future()
-      }*/
 }

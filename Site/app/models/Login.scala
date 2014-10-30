@@ -5,9 +5,6 @@ import scala.concurrent._
 import com.websudos.phantom.Implicits._
 import scala.concurrent.duration._
 
-/**
- * Created by maarten on 9/18/14.
- */
 case class Login(userID: Int)
 object Login {
   def getLoggedInUser(userID: Int): Userstate = {
@@ -22,12 +19,7 @@ object Login {
     }
   }
 
-  /*def login = {
-
-  }*/
-
   def logoutUser(userID: Int) = {
     Await.result(Userstates.deleteUser(userID), 500 millis)
   }
-
 }

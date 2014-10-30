@@ -42,9 +42,9 @@ object Application extends Controller {
     )
   )
 
-  def addFeed = Action { implicit request =>
+  def addFeed() = Action { implicit request =>
     val (newFeedName, newFeedID) = newFeedForm.bindFromRequest.get
-    val newFeed = Feeds.createFeed(newFeedName, newFeedID)
+    val newFeed = new Feed(newFeedID, newFeedName, true, "https://api.xively.com/v2/feeds/"+newFeedID, DateTime.now(), DateTime.now(), "https://xively.com/user/Sensalizer", "1.0.0")
     Feeds.insertNewRecord(newFeed)
     Redirect(routes.Application.index())
   }
@@ -97,7 +97,6 @@ object Application extends Controller {
 
   def getMQTT(feedID: String, apiKey: String): MQTT = {
     val mqtt = new MQTT()
-
     mqtt.setHost("api.xively.com", 1883)
     mqtt.setUserName(apiKey)
     mqtt.setCleanSession(false)
@@ -109,9 +108,7 @@ object Application extends Controller {
   def withIt(f: BlockingConnection => Unit)(implicit mqtt: MQTT) {
     val connection = mqtt.blockingConnection()
     connection.connect()
-
     f(connection)
-
     connection.disconnect()
   }
 
@@ -121,7 +118,7 @@ object Application extends Controller {
     var apiKeyStr: String = null
     var clientGUID: String = null
     val data = request.body.asFormUrlEncoded match {
-      case Some(map) => {
+      case Some(map) =>
         map.get("apikey") match {
           case Some(apikey) => apiKeyStr = apikey.apply(0);
           case None => throw new Exception("Invalid form data: no APIkey")
@@ -135,14 +132,11 @@ object Application extends Controller {
           case None => throw new Exception("Invalid form data: no GUID")
         }
 
-          val queueName = channel.queueDeclare().getQueue
-          channel.queueBind(queueName, "amq.topic", clientGUID)
-          //channel.basicPublish("myAwesomeExchange", "someRoutingKey",false, false, MessageProperties.TEXT_PLAIN, "Hello World!".getBytes())
-
-
+        val queueName = channel.queueDeclare().getQueue
+        channel.queueBind(queueName, "amq.topic", clientGUID)
 
         val labels = Await.result(models.Datastreams.getDatastreamIDs(feedIDStr.toInt), 2 seconds).distinct.toList
-        val dataValues: util.ArrayList[List[Float]] = new util.ArrayList[List[Float]];
+        val dataValues: util.ArrayList[List[Float]] = new util.ArrayList[List[Float]]
         labels.map(label => {
           val List: List[Float] = Await.result(models.Datastreams.getDataValueByStreamID(feedIDStr.toInt, label), 1500 millis).toList
           dataValues.add(List)
@@ -150,7 +144,7 @@ object Application extends Controller {
         val timestamps = Await.result(models.Datastreams.getInsertionTimes(feedIDStr.toInt), 2 seconds).toList.distinct
         println(createJsonFromDatastreams(feedIDStr.toInt, labels, dataValues, timestamps))
         channel.basicPublish("amq.topic", clientGUID, null, createJsonFromDatastreams(feedIDStr.toInt, labels, dataValues, timestamps).getBytes)
-      }
+
       case None => throw new Exception("Invalid form data: No form data")
     }
 
@@ -202,8 +196,11 @@ object Application extends Controller {
   def getMinMax(feedID: Int) = Action {
     val min = models.Statistics.getminimumValues(feedID).map(q => "%s: %s".format(q._1, q._2)).mkString("\n")
     val max = models.Statistics.getMaximumValues(feedID).map(q => "%s: %s".format(q._1, q._2)).mkString("\n")
-    Ok("Minimal: %s\nMaximum: %s".format(min, max))
-    //Ok("Minimal: %s\nMaximum: %s".format(0,1))
+    Ok("Minimal:\n %s\n\nMaximum:\n %s".format(min, max))
+  }
+
+  def getPeriods(feedID: Int) = Action {
+    Ok(models.Statistics.getPeriods(feedID).map(q => "%s: %s".format(q._1, q._2)).mkString("\n"))
   }
 
 
@@ -213,7 +210,5 @@ object Application extends Controller {
     //Await.result(models.Datastreams.createTable, 5000 millis)
     //Await.result(models.Userstates.createTable, 5000 millis)
     Feeds.getList.map(list => Ok(views.html.feeds(list, models.Login.getLoggedInUser(userID).APIKey)))
-
-
   }
 }

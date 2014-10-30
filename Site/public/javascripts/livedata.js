@@ -1,18 +1,17 @@
 $(document ).ready(function() {
+
+    var canvasContainer = $("#canvasContainer");
     $("#graphModForm").hide();
-    var ratio = $("#canvasContainer").height() / $("#canvasContainer").width();
+    var ratio = canvasContainer.height() / canvasContainer.width();
     //Get the context of the canvas element we want to select
     var c = $('#feedGraph');
     var ct = c.get(0).getContext('2d');
-    var ctx = document.getElementById("feedGraph").getContext("2d");
     /*************************************************************************/
     //Run function when window resizes
     $(window).resize(respondCanvas);
     function respondCanvas() {
-        c.attr('width', $("#canvasContainer").width());
-        c.attr('height', $("#canvasContainer").width() * (ratio));
-        //Call a function to redraw other content (texts, images etc)
-        //chart = new Chart(ct).Line(data, options);
+        c.attr('width', canvasContainer.width());
+        c.attr('height', canvasContainer.width() * (ratio));
     }
 
     //Initial call
@@ -36,13 +35,9 @@ $(document ).ready(function() {
             +'</li><br>'
             +'<% } %>'
             +'</ul>'
-    }
+    };
 
     document.styleSheets[0].addRule('#legend','list-style: none', 'padding:0', 'margin:0');
-
-    function padLeft(nr, n, str) {
-        return Array(n - String(nr).length + 1).join(str || '0') + nr;
-    }
 
     JSON.stringify = JSON.stringify || function (obj) {
         var t = typeof (obj);
@@ -140,7 +135,7 @@ $(document ).ready(function() {
                 type: "POST",
                 url: "triggerFeed",
                 data: {feedid: feedID, apikey: apiKey, guid: guid},
-                success: function(a){
+                success: function(){
                     console.log("cool");
                 }
             });
@@ -155,7 +150,7 @@ $(document ).ready(function() {
             var first = true;
             var chart = null;
 
-            var on_connect = function(x) {
+            var on_connect = function() {
                 //id = client.subscribe("/queue/"+guid, function(m){
                 id = client.subscribe("/topic/"+guid, function(m){
                     // reply by sending the reversed text to the temp queue defined in the "reply-to" header
@@ -178,9 +173,8 @@ $(document ).ready(function() {
                             var res = sortMultipleArrays(data.labels, followers);
                             console.log(res);
                             data.labels = res.sorted;
-                            var order = data.labels;
-                            for (var z = 0; z < res.followed.length; ++z) {
-                                data.datasets[0][z] = res.followed[z];
+                            for (var t = 0; t < res.followed.length; ++t) {
+                                data.datasets[0][t] = res.followed[t];
                             }
 
                         }
@@ -190,20 +184,20 @@ $(document ).ready(function() {
                             for (var i in data.labels)
                                 data.labels[i] = new Date(data.labels[i]).toTimeString().split(' ')[0];
                         }
-                        console.log(data.labels)
+                        console.log(data.labels);
                         data.datasets = data.datasets[0];
                         //add some colors, maximum of four. Add more if more datasets
 
                         //var colors = ["rgba(200,0,0,1)","rgba(0,200,0,1)","rgba(0,0,200,1)","rgba(200,200,200,1)","rgba(150,0,100,1)","rgba(100,150,0,1)","rgba(0,1000,150,1)","rgba(100,0,150,1)","rgba(200,50,250,1)","rgba(250,100,0,1)","rgba(250,150,50,1)","rgba(250,50,100,1)","rgba(200,50,50,1)","rgba(50,200,50,1)","rgba(50,150,200,1)","rgba(100,200,0,1)","rgba(200,150,150,1)","rgba(50,200,50,1)","rgba(150,150,200,1)","rgba(0,50,250,1)"]
 
-                        for (var z = 0; z < data.datasets.length; ++z) {
+                        for (var e = 0; e < data.datasets.length; ++e) {
                             var color='#'+(Math.random()*0xFFFFFF<<0).toString(16);
-                            data.datasets[z].pointColor = color;
-                            data.datasets[z].strokeColor = color;
-                            data.datasets[z].fillColor = "rgba(255.0, 255.0, 255.0, 1.0)";
+                            data.datasets[e].pointColor = color;
+                            data.datasets[e].strokeColor = color;
+                            data.datasets[e].fillColor = "rgba(255.0, 255.0, 255.0, 1.0)";
 
-                            document.styleSheets[0].addRule('#li'+z, 'display: inline');
-                            document.styleSheets[0].addRule('#li'+z+':before','content: "▪"; ' +
+                            document.styleSheets[0].addRule('#li'+e, 'display: inline');
+                            document.styleSheets[0].addRule('#li'+e+':before','content: "▪"; ' +
                                 'color: '+color+';'+
                                 'display: inline;' +
                                 'vertical-align: middle;' +
@@ -243,7 +237,7 @@ $(document ).ready(function() {
                 console.log('error');
             };
             client.connect('guest', 'guest', on_connect, on_error, '/');
-           // setInterval(function(){
+            setInterval(function(){
                 console.log("called");
                 $.ajax({
                     type: "GET",
@@ -261,7 +255,15 @@ $(document ).ready(function() {
                         document.getElementById("minmaxStatistics").innerText = a
                     }
                 });
-           // }, 2000);
+                $.ajax({
+                    type: "GET",
+                    url: "getPeriods/" + feedID,
+                    success: function (a) {
+                        console.log(a);
+                        document.getElementById("periodStatistics").innerText = a
+                    }
+                });
+            }, 2000);
         }
     });
 });

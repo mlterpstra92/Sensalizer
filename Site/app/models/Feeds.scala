@@ -9,7 +9,19 @@ import com.websudos.phantom.column.DateTimeColumn
 import com.twitter.conversions.time._
 import scala.concurrent.Future
 
-abstract case class Feeds extends CassandraTable[Feeds, Feed]{
+case class Feed(
+                 feedID: Int,
+                 title: String,
+                 priv: Boolean,
+                 url: String,
+                 updated: DateTime,
+                 created: DateTime,
+                 creator: String,
+                 version: String
+                 )
+object Feed{}
+
+abstract case class Feeds() extends CassandraTable[Feeds, Feed]{
   object feedID extends IntColumn(this) with PartitionKey[Int]{
     override lazy val name = "feedID"
   }
@@ -21,7 +33,7 @@ abstract case class Feeds extends CassandraTable[Feeds, Feed]{
   object creator extends StringColumn(this)
   object version extends StringColumn(this)
 }
-object Feeds extends Feeds with MyDBConnector {
+object Feeds extends Feeds with CassandraConnector {
   // you can even rename the table in the schema to whatever you like.
   override lazy val tableName = "feeds"
 
@@ -41,7 +53,7 @@ object Feeds extends Feeds with MyDBConnector {
       .future()
   }
 
-  override def fromRow(r: Row): Feed = Feed(feedID(r), title(r), priv(r), url(r), updated(r), created(r), creator(r), version(r));
+  override def fromRow(r: Row): Feed = Feed(feedID(r), title(r), priv(r), url(r), updated(r), created(r), creator(r), version(r))
   // now you have the full power of Cassandra in really cool one liners.
   // The future will do all the heavy lifting for you.
   // If there is an error you get a failed Future.
@@ -57,13 +69,8 @@ object Feeds extends Feeds with MyDBConnector {
   def getList: Future[Seq[Feed]] = {
     select.fetch
   }
-
-  def createFeed(feedName: String, feedID: Int): Feed = {
-    val newFeed = new Feed(feedID, feedName, true, "https://api.xively.com/v2/feeds/"+feedID, DateTime.now(), DateTime.now(), "https://xively.com/user/Sensalizer", "1.0.0")
-    return newFeed
-  }
-
+/*
   def deleteUser(id: Int) = {
     delete.where(_.feedID eqs id).future()
-  }
+  }*/
 }
