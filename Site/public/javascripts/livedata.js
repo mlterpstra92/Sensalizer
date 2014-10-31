@@ -14,6 +14,12 @@ $(document ).ready(function() {
         c.attr('height', canvasContainer.width() * (ratio));
     }
 
+    $('.dropdown-menu').on('click', function(e) {
+        if($(this).hasClass('dropdown-menu-form')) {
+            e.stopPropagation();
+        }
+    });
+
     //Initial call
     respondCanvas();
 
@@ -80,17 +86,40 @@ $(document ).ready(function() {
         ct = canvas.get(0).getContext('2d');
         respondCanvas();
     };
-    function addList(labels){
+    function addList(label_text){
         var select = document.getElementById("dropdown");
-        for(var z in labels) {
-            var option = document.createElement('option');
-            option.text = option.value = z;
-            select.appendChild(option)
-        }
+
+        var checkbox = document.createElement('input');
+        checkbox.type = "checkbox";
+        checkbox.name = "name";
+        checkbox.value = "value";
+        checkbox.id = "datasetbox";
+        checkbox.checked = true;
+
+        var label = document.createElement('label')
+        label.htmlFor = "id";
+        label.appendChild(document.createTextNode(label_text));
+
+        select.appendChild(checkbox);
+        select.appendChild(label);
+
+        var br = document.createElement("br");
+        select.appendChild(br);
     }
+
     var cycle;
     var numDatapoints = 10;
     //Apparently, we eat click events, so use event delegation
+    $("#checkbox_all").on('click', function() {
+        var state = document.getElementById("checkbox_all").checked;
+        console.log("STATE");console.log(state);
+        var allInputs = document.getElementsByTagName("input");
+        for (var i = 0, max = allInputs.length; i < max; i++){
+            if (allInputs[i].type === 'checkbox' && allInputs[i].id === 'datasetbox')
+                allInputs[i].checked = state;
+        }
+    });
+
     $(this).on('click', 'button', function (e) {
         e.preventDefault();
 
@@ -105,6 +134,7 @@ $(document ).ready(function() {
             }
             numDatapoints = n;
         }
+
         if (e.currentTarget.id == "selectFeed") {
             if (chart)
                 resetCanvas();
@@ -171,6 +201,7 @@ $(document ).ready(function() {
                                 'padding-right: 10px');
 
                             data.datasets[e].data.reverse();
+                            addList(data.datasets[e].label);
                         }
 
                         // Initialize chart
@@ -179,8 +210,8 @@ $(document ).ready(function() {
                         document.getElementById("legend").innerHTML = chart.generateLegend();
                         first = false;
 
-                        var templist = ["abc","def"];
-                        addList(templist)
+                        //var templist = ["abc","def"];
+                        //addList(templist)
                     }
                     else
                     {

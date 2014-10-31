@@ -111,44 +111,22 @@
                                     <button type="button" class="form-control btn-sm" id="applyNumLim">Apply</button>
                                     <div class="input-group" class="col-xs-4">
                                         <div class="input-group-btn">
-                                            <button tabindex="-1" class="btn btn-default" type="button">Active data</button>
+                                            <!--<button tabindex="-1" class="btn btn-default" type="button">Active data</button>
                                             <button tabindex="-1" data-toggle="dropdown" class="btn btn-default dropdown-toggle" type="button">
                                                 <span class="caret"></span>
-                                            </button>
-                                            <ul role="menu" class="dropdown-menu" id="dropdown">
-                                                <li><a href="#">
-                                                    <input type="checkbox" checked><span class="lbl"> All</span>
-                                                </a></li>
-                                                <li class="divider"></li>
-                                                    <!--<li><a href="#">
-                                                <input type="checkbox">
-                                                <span class="lbl"> Monday</span>
-                                            </a></li>
-                                            <li><a href="#">
-                                                <input type="checkbox"><span class="lbl">
-                                                Tuesday</span>
-                                            </a></li>
-                                            <li><a href="#">
-                                                <input type="checkbox"><span class="lbl">
-                                                Wednesday</span>
-                                            </a></li>
-                                            <li><a href="#">
-                                                <input type="checkbox"><span class="lbl">
-                                                Thursday</span>
-                                            </a></li>
-                                            <li><a href="#">
-                                                <input type="checkbox"><span class="lbl">
-                                                Friday</span>
-                                            </a></li>
-                                            <li><a href="#">
-                                                <input type="checkbox"><span class="lbl">
-                                                Saturday</span>
-                                            </a></li>
-                                            <li><a href="#">
-                                                <input type="checkbox"><span class="lbl">
-                                                Sunday</span>
-                                            </a></li>-->
-                                            </ul>
+                                            </button>-->
+                                            <div class="dropdown">
+                                                <a class="dropdown-toggle btn" data-toggle="dropdown" href="#">
+                                                    Active data
+                                                    <b class="caret"></b>
+                                                </a>
+                                                <ul role="menu" class="dropdown-menu dropdown-menu-form" id="dropdown">
+                                                    <li><a href="#">
+                                                        <input id="checkbox_all" type="checkbox" checked><span class="lbl"> All</span>
+                                                    </a></li>
+                                                    <li class="divider"></li>
+                                                </ul>
+                                            </div>
                                         </div>
                                     </div>
                                     <div class="checkbox" id="liveDataDiv">
