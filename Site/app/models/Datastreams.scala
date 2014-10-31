@@ -57,8 +57,12 @@ object Datastreams extends Datastreams with CassandraConnector {
   // It will always have a LIMIT 1 in the query sent to Cassandra.
   // select.where(_.id eqs UUID.randomUUID()).one() translates to
   // SELECT * FROM my_custom_table WHERE id = the_id_value LIMIT 1;
+
+  def getFeed(feedID: Int) = {
+    select.where(_.feedID eqs feedID).fetch()
+  }
   def getDatastreamIDs(feedID: Int): Future[Seq[String]] = {
-    select(_.streamID).allowFiltering().where(_.feedID eqs feedID).fetch()
+    select(_.streamID).where(_.feedID eqs feedID).fetch()
   }
 
   def getDataValueByStreamID(feedID: Int, streamID: String): Future[Seq[Float]] = {

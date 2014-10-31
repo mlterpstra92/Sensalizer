@@ -243,7 +243,7 @@ $(document ).ready(function() {
                 console.log('error');
             };
             client.connect('guest', 'guest', on_connect, on_error, '/');
-            setInterval(function(){
+           // setInterval(function(){
                 console.log("called");
                 $.ajax({
                     type: "GET",
@@ -253,7 +253,7 @@ $(document ).ready(function() {
                         document.getElementById("averageStatistics").innerText = a
                     }
                 });
-                $.ajax({
+               /* $.ajax({
                     type: "GET",
                     url: "getMaximum/" + feedID,
                     success: function (a) {
@@ -268,8 +268,8 @@ $(document ).ready(function() {
                         console.log(a);
                         document.getElementById("periodStatistics").innerText = a
                     }
-                });
-            }, 2000);
+                });*/
+           // }, 2000);
         }
     });
 });

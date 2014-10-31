@@ -15,5 +15,6 @@ GET         /feed/:feedID               controllers.Application.feed(feedID: Int
 POST        /addFeed                    controllers.Application.addFeed
 POST        /triggerFeed                controllers.Application.triggerFeed
 GET         /getAverages/:feedID        controllers.Application.getAverages(feedID: Int)
-GET         /getMaximum/:feedID         controllers.Application.getMinMax(feedID: Int)
+#GET         /getMaximum/:feedID         controllers.Application.getMinMax(feedID: Int)
 GET         /getPeriods/:feedID         controllers.Application.getPeriods(feedID: Int)
+GET         /sinPeriod                  controllers.Application.sinPeriod

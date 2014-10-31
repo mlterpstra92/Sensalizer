@@ -187,28 +187,29 @@ object Application extends Controller {
     Ok("");
   }
 
-  def feed(feedID: Int) = Action.async {
-    models.Datastreams.getDatastreamIDs(feedID).map(res =>
-      Ok("HALLO")
-    )
+  def feed(feedID: Int) = Action {
+    val q = Await.result(models.Datastreams.getDatastreamIDs(feedID), 2 seconds)
+    Ok("Feed " + feedID + ": \n" + q.mkString("\n"))
   }
 
   def getAverages(feedID: Int) = Action {
     Ok(models.Statistics.getAverageDataStreamValues(feedID).map(q => "%s: %s".format(q._1, q._2)).mkString("\n"))
    // Ok("asdf")
   }
-
+/*
   def getMinMax(feedID: Int) = Action {
     val min = models.Statistics.getminimumValues(feedID).map(q => "%s: %s".format(q._1, q._2)).mkString("\n")
     val max = models.Statistics.getMaximumValues(feedID).map(q => "%s: %s".format(q._1, q._2)).mkString("\n")
     Ok("Minimal:\n %s\n\nMaximum:\n %s".format(min, max))
   }
-
+*/
   def getPeriods(feedID: Int) = Action {
     Ok(models.Statistics.getPeriods(feedID).map(q => "%s: %s".format(q._1, q._2)).mkString("\n"))
   }
 
-
+  def sinPeriod = Action {
+    Ok(models.Statistics.getSinusPeriod.toString)
+  }
   def feeds(userID: Int) = Action.async {
     //Create tables
     //Await.result(models.Feeds.createTable, 5000 millis)
