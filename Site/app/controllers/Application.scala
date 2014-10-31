@@ -2,6 +2,8 @@ package controllers
 
 import java.util
 
+import com.google.common.base.Charsets
+import com.google.common.io.BaseEncoding
 import com.rabbitmq.client._
 import org.fusesource.mqtt.client.{Topic, BlockingConnection, MQTT, QoS}
 
@@ -194,29 +196,28 @@ object Application extends Controller {
 
   def getAverages(feedID: Int) = Action {
     Ok(models.Statistics.getAverageDataStreamValues(feedID).map(q => "%s: %s".format(q._1, q._2)).mkString("\n"))
-   // Ok("asdf")
   }
-/*
+
   def getMinMax(feedID: Int) = Action {
     val min = models.Statistics.getminimumValues(feedID).map(q => "%s: %s".format(q._1, q._2)).mkString("\n")
     val max = models.Statistics.getMaximumValues(feedID).map(q => "%s: %s".format(q._1, q._2)).mkString("\n")
     Ok("Minimal:\n %s\n\nMaximum:\n %s".format(min, max))
   }
-*/
+
   def getPeriods(feedID: Int) = Action {
     Ok(models.Statistics.getPeriods(feedID).map(q => "%s: %s".format(q._1, q._2)).mkString("\n"))
   }
 
-  def sinPeriod = Action {
-    Ok(models.Statistics.getSinusPeriod.toString)
+  def getAboveThreshold(feedIDpack: String) = Action {
+    val items = new String(BaseEncoding.base64().decode(feedIDpack).map(_.toChar)).split("-")
+    Ok(models.Statistics.getAboveThreshold(items.apply(0).toInt, items.apply(1).toFloat).mkString("\n"))
   }
+
   def feeds(userID: Int) = Action.async {
     //Create tables
     //Await.result(models.Feeds.createTable, 5000 millis)
     //Await.result(models.Datastreams.createTable, 5000 millis)
     //Await.result(models.Userstates.createTable, 5000 millis)
     Feeds.getList.map(list => Ok(views.html.feeds(list, models.Login.getLoggedInUser(userID).APIKey)))
-
-
   }
 }

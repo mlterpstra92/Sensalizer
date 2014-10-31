@@ -3,18 +3,18 @@
 # ~~~~
 
 # Home page
-GET         /                           controllers.Application.index
+GET         /                                 controllers.Application.index
 
 # Map static resources from the /public folder to the /assets URL path
-GET         /assets/*file               controllers.Assets.at(path="/public", file)
+GET         /assets/*file                     controllers.Assets.at(path="/public", file)
 
 # View your profile
-GET         /profile/:userID            controllers.Application.profile(userID: Int)
-GET         /feeds/:userID              controllers.Application.feeds(userID: Int)
-GET         /feed/:feedID               controllers.Application.feed(feedID: Int)
-POST        /addFeed                    controllers.Application.addFeed
-POST        /triggerFeed                controllers.Application.triggerFeed
-GET         /getAverages/:feedID        controllers.Application.getAverages(feedID: Int)
-#GET         /getMaximum/:feedID         controllers.Application.getMinMax(feedID: Int)
-GET         /getPeriods/:feedID         controllers.Application.getPeriods(feedID: Int)
-GET         /sinPeriod                  controllers.Application.sinPeriod
+GET         /profile/:userID                  controllers.Application.profile(userID: Int)
+GET         /feeds/:userID                    controllers.Application.feeds(userID: Int)
+GET         /feed/:feedID                     controllers.Application.feed(feedID: Int)
+POST        /addFeed                          controllers.Application.addFeed
+POST        /triggerFeed                      controllers.Application.triggerFeed
+GET         /getAverages/:feedID              controllers.Application.getAverages(feedID: Int)
+GET         /getMaximum/:feedID               controllers.Application.getMinMax(feedID: Int)
+GET         /getPeriods/:feedID               controllers.Application.getPeriods(feedID: Int)
+GET         /getAboveThreshold/:base64        controllers.Application.getAboveThreshold(base64: String)
