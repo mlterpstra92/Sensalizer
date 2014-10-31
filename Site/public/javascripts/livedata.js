@@ -6,6 +6,7 @@ $(document ).ready(function() {
     //Get the context of the canvas element we want to select
     var c = $('#feedGraph');
     var ct = c.get(0).getContext('2d');
+    var ctx = document.getElementById("feedGraph").getContext("2d");
     /*************************************************************************/
     //Run function when window resizes
     $(window).resize(respondCanvas);
@@ -107,20 +108,29 @@ $(document ).ready(function() {
         ct = canvas.get(0).getContext('2d');
         respondCanvas();
     };
-
+    function addList(labels){
+        var select = document.getElementById("dropdown");
+        for(var z in labels) {
+            var option = document.createElement('option');
+            option.text = option.value = z;
+            select.appendChild(option)
+        }
+    }
+    var cycle
     var numDatapoints = 10;
-    var cycle = 0;
     //Apparently, we eat click events, so use event delegation
     $(this).on('click', 'button', function (e) {
         e.preventDefault();
 
         if (e.currentTarget.id == "applyNumLim"){
-            var n = document.getElementById("numDataPoints").value;
-
+            var n = Number(document.getElementById("numDataPoints").value);
+            console.log("n is hier " + n+ "en cycle is hier "+ cycle);
             if (cycle > n){
                 cycle = n
             }
-
+            if (cycle < n){
+                console.log("YAY")
+            }
             numDatapoints = n;
         }
         if (e.currentTarget.id == "selectFeed") {
@@ -158,6 +168,8 @@ $(document ).ready(function() {
                     var data = JSON.parse(m.body);
                     //client.ack(m);
                     if (first) {
+                        cycle = data.labels.length;
+
                         //console.log(data);
                         if (data && data.datasets) {
                             var followers = [];
@@ -212,6 +224,9 @@ $(document ).ready(function() {
                         $("#graphModForm").show();
                         document.getElementById("legend").innerHTML = chart.generateLegend();
                         first = false
+
+                        templist = ["abc","def"]
+                        addList(templist)
                     }
                     else
                     {
@@ -226,8 +241,14 @@ $(document ).ready(function() {
 
                     console.log(cycle);
 
-                    if (cycle > numDatapoints){
+                    while (cycle > numDatapoints){
                         chart.removeData()
+                        cycle= cycle -1
+                    }
+                    if (cycle < numDatapoints){
+                        //statement kan weg... hier komt ie nooit by design
+                        //chart.destroy()
+                        console.log("oooops")
                     }
                     cycle = cycle + 1;
                     chart.update();

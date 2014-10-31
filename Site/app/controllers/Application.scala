@@ -97,6 +97,7 @@ object Application extends Controller {
 
   def getMQTT(feedID: String, apiKey: String): MQTT = {
     val mqtt = new MQTT()
+
     mqtt.setHost("api.xively.com", 1883)
     mqtt.setUserName(apiKey)
     mqtt.setCleanSession(false)
@@ -108,7 +109,9 @@ object Application extends Controller {
   def withIt(f: BlockingConnection => Unit)(implicit mqtt: MQTT) {
     val connection = mqtt.blockingConnection()
     connection.connect()
+
     f(connection)
+
     connection.disconnect()
   }
 
@@ -134,6 +137,8 @@ object Application extends Controller {
 
         val queueName = channel.queueDeclare().getQueue
         channel.queueBind(queueName, "amq.topic", clientGUID)
+
+
 
         val labels = Await.result(models.Datastreams.getDatastreamIDs(feedIDStr.toInt), 2 seconds).distinct.toList
         val dataValues: util.ArrayList[List[Float]] = new util.ArrayList[List[Float]]
@@ -210,5 +215,7 @@ object Application extends Controller {
     //Await.result(models.Datastreams.createTable, 5000 millis)
     //Await.result(models.Userstates.createTable, 5000 millis)
     Feeds.getList.map(list => Ok(views.html.feeds(list, models.Login.getLoggedInUser(userID).APIKey)))
+
+
   }
 }
