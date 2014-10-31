@@ -6,7 +6,6 @@ $(document ).ready(function() {
     //Get the context of the canvas element we want to select
     var c = $('#feedGraph');
     var ct = c.get(0).getContext('2d');
-    var ctx = document.getElementById("feedGraph").getContext("2d");
     /*************************************************************************/
     //Run function when window resizes
     $(window).resize(respondCanvas);
@@ -38,7 +37,7 @@ $(document ).ready(function() {
             +'</ul>'
     };
 
-    document.styleSheets[0].addRule('#legend','list-style: none', 'padding:0', 'margin:0');
+    document.styleSheets[0].addRule('#legend', 'list-style: none; padding:0; margin:0');
 
     JSON.stringify = JSON.stringify || function (obj) {
         var t = typeof (obj);
@@ -59,33 +58,6 @@ $(document ).ready(function() {
             }
             return (arr ? "[" : "{") + String(json) + (arr ? "]" : "}");
         }
-    };
-    var getSortedIndex = function (arr) {
-        var index = [];
-        for (var i = 0; i < arr.length; i++) {
-            index.push(i);
-        }
-        index = index.sort((function(arr){
-            /* this will sort ints in descending order, change it based on your needs */
-            return function (a, b) {return ((arr[a] > arr[b]) ? 1 : ((arr[a] < arr[b]) ? -1 : 0));
-            };
-        })(arr));
-        return index;
-    };
-    var sortMultipleArrays = function (sort, followers) {
-        var index = getSortedIndex(sort)
-            , followed = [];
-        followers.unshift(sort);
-        followers.forEach(function(arr){
-            var _arr = [];
-            for(var i = 0; i < arr.length; i++)
-                _arr[i] = arr[index[i]];
-            followed.push(_arr);
-        });
-        var result =  {sorted: followed[0]};
-        followed.shift();
-        result.followed = followed;
-        return result;
     };
 
     function generateGUID() {
@@ -116,7 +88,7 @@ $(document ).ready(function() {
             select.appendChild(option)
         }
     }
-    var cycle
+    var cycle;
     var numDatapoints = 10;
     //Apparently, we eat click events, so use event delegation
     $(this).on('click', 'button', function (e) {
@@ -162,7 +134,7 @@ $(document ).ready(function() {
 
             var on_connect = function() {
                 //id = client.subscribe("/queue/"+guid, function(m){
-                id = client.subscribe("/topic/"+guid, function(m){
+                client.subscribe("/topic/"+guid, function(m){
                     // reply by sending the reversed text to the temp queue defined in the "reply-to" header
                     // console.log("SUCCESS!");
                     var data = JSON.parse(m.body);
@@ -170,37 +142,16 @@ $(document ).ready(function() {
                     if (first) {
                         cycle = data.labels.length;
 
-                        //console.log(data);
-                        if (data && data.datasets) {
-                            var followers = [];
-                            for (var j in data.datasets) {
-                                var newData = [];
-                                for (var q in data.datasets[j]){
-                                    newData.push(data.datasets[j][q].data)
-                                }
-                                followers.push(newData)
-                            }
-                            //console.log(followers)
-
-                            var res = sortMultipleArrays(data.labels, followers);
-                            console.log(res);
-                            data.labels = res.sorted;
-                            for (var t = 0; t < res.followed.length; ++t) {
-                                data.datasets[0][t] = res.followed[t];
-                            }
-
-                        }
-
-
+                        // Initialize labels
                         if (data && data.labels) {
                             for (var i in data.labels)
                                 data.labels[i] = new Date(data.labels[i]).toTimeString().split(' ')[0];
                         }
-                        console.log(data.labels);
-                        data.datasets = data.datasets[0];
-                        //add some colors, maximum of four. Add more if more datasets
 
-                        //var colors = ["rgba(200,0,0,1)","rgba(0,200,0,1)","rgba(0,0,200,1)","rgba(200,200,200,1)","rgba(150,0,100,1)","rgba(100,150,0,1)","rgba(0,1000,150,1)","rgba(100,0,150,1)","rgba(200,50,250,1)","rgba(250,100,0,1)","rgba(250,150,50,1)","rgba(250,50,100,1)","rgba(200,50,50,1)","rgba(50,200,50,1)","rgba(50,150,200,1)","rgba(100,200,0,1)","rgba(200,150,150,1)","rgba(50,200,50,1)","rgba(150,150,200,1)","rgba(0,50,250,1)"]
+                        data.labels.reverse();
+
+                        // Initialize datapoints
+                        data.datasets = data.datasets[0];
 
                         for (var e = 0; e < data.datasets.length; ++e) {
                             var color='#'+(Math.random()*0xFFFFFF<<0).toString(16);
@@ -218,14 +169,17 @@ $(document ).ready(function() {
                                 'width: 40px' +
                                 'height: 40px' +
                                 'padding-right: 10px');
+
+                            data.datasets[e].data.reverse();
                         }
 
+                        // Initialize chart
                         chart = new Chart(ct).Line(data, options);
                         $("#graphModForm").show();
                         document.getElementById("legend").innerHTML = chart.generateLegend();
-                        first = false
+                        first = false;
 
-                        templist = ["abc","def"]
+                        var templist = ["abc","def"];
                         addList(templist)
                     }
                     else
@@ -242,7 +196,7 @@ $(document ).ready(function() {
                     console.log(cycle);
 
                     while (cycle > numDatapoints){
-                        chart.removeData()
+                        chart.removeData();
                         cycle= cycle -1
                     }
                     if (cycle < numDatapoints){
