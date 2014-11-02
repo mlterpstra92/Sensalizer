@@ -1,5 +1,5 @@
 $(document ).ready(function() {
-
+    //Initialize selectors for interaction with graph data
     var canvasContainer = $("#canvasContainer");
     $("#graphModForm").hide();
     var ratio = canvasContainer.height() / canvasContainer.width();
@@ -7,7 +7,8 @@ $(document ).ready(function() {
     var c = $('#feedGraph');
     var ct = c.get(0).getContext('2d');
     /*************************************************************************/
-    //Run function when window resizes
+    //Run function when window resizes, this is necessary to make it interactive
+    //and responsive
     $(window).resize(respondCanvas);
     function respondCanvas() {
         c.attr('width', canvasContainer.width());
@@ -23,7 +24,7 @@ $(document ).ready(function() {
     //Initial call
     respondCanvas();
 
-    //legend!
+    //options for Chart.js
     var options = {
         responsive : true,
         animation: false,
@@ -43,8 +44,10 @@ $(document ).ready(function() {
             +'</ul>'
     };
 
+    //TODO: firefox complains about this for some reason
     document.styleSheets[0].addRule('#legend', 'list-style: none; padding:0; margin:0');
 
+    //Turn a JSON object into a string. This is necessary for message passing
     JSON.stringify = JSON.stringify || function (obj) {
         var t = typeof (obj);
         if (t != "object" || obj === null) {
@@ -66,6 +69,9 @@ $(document ).ready(function() {
         }
     };
 
+    //Client generates GUID. This is necessary in the backend for
+    //client identification. Because a new queue is generated for
+    //each client, this is necessary for which queue to use
     function generateGUID() {
         var result, i, j;
         result = '';
@@ -78,6 +84,9 @@ $(document ).ready(function() {
         return result;
     }
 
+    //Ugly hack. Chart.js can't be easily deactived. So normally if an user selects a new feed
+    //the old feed continues to update, causing graphical glitches. To solve this, the canvas
+    //element is removed from the HTML and then readded. Ugh.
     var resetCanvas = function(){
         var canvas = $('#feedGraph');
         canvas.remove();
@@ -96,7 +105,7 @@ $(document ).ready(function() {
         checkbox.id = "datasetbox";
         checkbox.checked = true;
 
-        var label = document.createElement('label')
+        var label = document.createElement('label');
         label.htmlFor = "id";
         label.appendChild(document.createTextNode(label_text));
 
@@ -143,15 +152,13 @@ $(document ).ready(function() {
             var apiKey = $(this).parent().parent().find('td')[3].innerHTML.trim();
             console.log(apiKey);
             console.log(guid);
-            $.ajax({
-                type: "POST",
+            $.post({
                 url: "triggerFeed",
-                data: {feedid: feedID, apikey: apiKey, guid: guid},
-                success: function(){
-                    console.log("cool");
-                }
+                data: {feedid: feedID, apikey: apiKey, guid: guid}
             });
 
+            //Initialize RabbitMQ for backend communication. Communication
+            //protocol is STOMP
             var RabbitMQIP = "54.171.159.157";
             var ws = new SockJS('http://' + RabbitMQIP + ':15674/stomp');
             var client = Stomp.over(ws);
@@ -163,12 +170,10 @@ $(document ).ready(function() {
             var chart = null;
 
             var on_connect = function() {
-                //id = client.subscribe("/queue/"+guid, function(m){
                 client.subscribe("/topic/"+guid, function(m){
-                    // reply by sending the reversed text to the temp queue defined in the "reply-to" header
-                    // console.log("SUCCESS!");
                     var data = JSON.parse(m.body);
-                    //client.ack(m);
+                    //First message is initializer message which creates Chart.js
+                    //so we need to differentiate between first message and rest
                     if (first) {
                         cycle = data.labels.length;
 
@@ -183,6 +188,7 @@ $(document ).ready(function() {
                         // Initialize datapoints
                         data.datasets = data.datasets[0];
 
+                        //Assign random colors
                         for (var e = 0; e < data.datasets.length; ++e) {
                             var color='#'+(Math.random()*0xFFFFFF<<0).toString(16);
                             data.datasets[e].pointColor = color;
@@ -209,21 +215,18 @@ $(document ).ready(function() {
                         $("#graphModForm").show();
                         document.getElementById("legend").innerHTML = chart.generateLegend();
                         first = false;
-
-                        //var templist = ["abc","def"];
-                        //addList(templist)
                     }
                     else
                     {
                         var timeString = new Date(data.label).toTimeString().split(' ')[0];
                         console.log(data.current_value);
+                        //We get data newest-first, while we store it as oldest first
+                        //So we need to reversed
                         data.current_value = data.current_value.reverse();
                         if ($("#liveData").prop('checked')){
                             chart.addData(data.current_value, timeString);
                         }
                     }
-                    //console.log(chart);
-
                     console.log(cycle);
 
                     while (cycle > numDatapoints){
@@ -243,6 +246,10 @@ $(document ).ready(function() {
                 console.log('error');
             };
             client.connect('guest', 'guest', on_connect, on_error, '/');
+
+            //Fetch statistics. This is a very ugly solution to stream data
+            //But because Play! framework can't stream data this is what we have
+            //to resort to.
             setInterval(function(){
                 console.log("called");
                 $.ajax({

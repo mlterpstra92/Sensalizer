@@ -1,16 +1,12 @@
 package models
 
-import java.util.UUID
-
 import com.datastax.driver.core.{ResultSet, Row}
 import com.websudos.phantom.CassandraTable
 import com.websudos.phantom.Implicits._
-import com.websudos.phantom.column.{SetColumn, DateTimeColumn}
+import com.websudos.phantom.column.DateTimeColumn
 import com.twitter.conversions.time._
-//import scala.concurrent.duration._
-import com.websudos.phantom.iteratee.Iteratee
 import org.joda.time.DateTime
-import scala.concurrent.{Await, Future}
+import scala.concurrent.Future
 
 
 case class Datastream(

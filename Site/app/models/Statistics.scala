@@ -1,10 +1,8 @@
 package models
 
-import org.apache.spark.sql.SchemaRDD
 import org.apache.spark.streaming.{StreamingContext, Duration}
 import org.apache.spark.{SparkContext,SparkConf}
 import com.datastax.spark.connector.streaming._
-import org.apache.spark.sql.cassandra.CassandraSQLContext
 import org.joda.time._
 import org.joda.time.DateTime
 import org.joda.time.format.{PeriodFormatter, PeriodFormatterBuilder}
@@ -14,22 +12,23 @@ case class Statistics(feedID: Int) {
 
 }
 object Statistics {
+  //Define spark constants
   val conf = new SparkConf(true).set("spark.cassandra.connection.host", "54.171.159.183")
   .set("cassandra.connection.host", "54.171.159.183")
-  .setSparkHome("/home/ubuntu/spark-1.1.0-bin-hadoop2.4")
   val sc = new SparkContext("local[2]", "sensalizer", conf)
   val ssc = new StreamingContext(sc, Duration.apply(2000))
-  val cc = new CassandraSQLContext(sc)
-  val data = null
 
   def getAverageDataStreamValues(feedID: Int): Array[(String, Float)] = {
+    //Select (streamid, averageValue) for every streamid
     ssc.cassandraTable("sensalizer", "datastreams").where("feedid = ?", feedID).select("streamid", "currentvalue").groupBy(row => row.getString("streamid")).map(u => (u._1, {val q = u._2.map(k => k.getFloat("currentvalue")); q.sum/q.size})).collect()
   }
 
   def getMaximumValues(feedID: Int): Array[(String, Float)] = {
+    //Select (streamid, maxValue) for every streamid
     ssc.cassandraTable("sensalizer", "datastreams").where("feedid = ?", feedID).select("streamid", "currentvalue").groupBy(row => row.getString("streamid")).map(u => (u._1, u._2.map(k => k.getFloat("currentvalue")).max)).collect()
   }
   def getminimumValues(feedID: Int): Array[(String, Float)] = {
+    //Select (streamid, minValue) for every streamid
     ssc.cassandraTable("sensalizer", "datastreams").where("feedid = ?", feedID).select("streamid", "currentvalue").groupBy(row => row.getString("streamid")).map(u => (u._1, u._2.map(k => k.getFloat("currentvalue")).min)).collect()
   }
 
@@ -74,6 +73,7 @@ object Statistics {
       val differenceListMax = sc.parallelize(timeListsMax.zip(timeListsMax.drop(1))).map(a => math.abs(a._1 - a._2)).collect()
       val differenceListMin = sc.parallelize(timeListsMin.zip(timeListsMin.drop(1))).map(a => math.abs(a._1 - a._2)).collect()
 
+      //average periods for upper and lower
       val avgMax = differenceListMax.sum.toFloat / differenceListMax.length
       val avgMin = differenceListMin.sum.toFloat / differenceListMin.length
 
@@ -91,10 +91,12 @@ object Statistics {
     implicit object DateTimeOrdering extends Ordering[DateTime] {
       def compare(d1: DateTime, d2: DateTime) = d1.compareTo(d2)
     }
+    //find latest time
     val latestTime = sc.parallelize(sets.apply(0)._2.toList.map(u => u.getDateTime("insertiontime"))).max()
     var retStr: Array[String] = Array[String]()
     for (item <- sets)
     {
+      //select latest values that are above threshold
       retStr ++= sc.parallelize(item._2.toList.filter(u => u.getDateTime("insertiontime") == latestTime).toList.filter(u => u.getFloat("currentvalue") >= threshold).map(u => u.getString("streamid"))).collect()
     }
     retStr

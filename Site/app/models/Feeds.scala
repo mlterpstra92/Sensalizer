@@ -1,7 +1,6 @@
 package models
 
-import java.util.UUID
-import org.joda.time.{DateTimeComparator, DateTime}
+import org.joda.time.DateTime
 import com.datastax.driver.core.{ResultSet, Row}
 import com.websudos.phantom.CassandraTable
 import com.websudos.phantom.Implicits._
@@ -69,8 +68,4 @@ object Feeds extends Feeds with CassandraConnector {
   def getList: Future[Seq[Feed]] = {
     select.fetch
   }
-/*
-  def deleteUser(id: Int) = {
-    delete.where(_.feedID eqs id).future()
-  }*/
 }
