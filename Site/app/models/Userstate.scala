@@ -33,7 +33,7 @@ object Userstates extends Userstates with CassandraConnector {
     insert.value(_.userID, us.userID)
       .value(_.username, us.username)
       .value(_.APIkey, us.APIKey)
-      .ttl(10000000.minutes.inSeconds) // you can use TTL if you want to.
+      //.ttl(null) // you can use TTL if you want to.
       .future()
   }
 

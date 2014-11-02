@@ -49,7 +49,7 @@ object Feeds extends Feeds with CassandraConnector {
       .value(_.created, feed.created)
       .value(_.creator, feed.creator)
       .value(_.version, feed.version)
-      .ttl(1000000.minutes.inSeconds) // you can use TTL if you want to.
+      //.ttl(1000000.minutes.inSeconds) // you can use TTL if you want to.
       .future()
   }
 
