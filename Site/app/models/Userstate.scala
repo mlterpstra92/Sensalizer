@@ -26,14 +26,14 @@ object Userstates extends Userstates with CassandraConnector {
   // you can even rename the table in the schema to whatever you like.
   override lazy val tableName = "userstates"
 
-  // Inserting has a bit of boilerplate on its on.
+  // Inserting has a bit of boilerplacdte on its on.
   // But it's almost always a once per table thing, hopefully bearable.
   // Whatever values you leave out will be inserted as nulls into Cassandra.
   def insertNewRecord(us: Userstate): Future[ResultSet] = {
     insert.value(_.userID, us.userID)
       .value(_.username, us.username)
       .value(_.APIkey, us.APIKey)
-      //.ttl(null) // you can use TTL if you want to.
+      .ttl(100.days.inSeconds) // you can use TTL if you want to.
       .future()
   }
 
