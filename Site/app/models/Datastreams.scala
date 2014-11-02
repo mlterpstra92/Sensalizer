@@ -44,7 +44,7 @@ object Datastreams extends Datastreams with CassandraConnector {
       .value(_.streamID, ds.streamID)
       .value(_.currentValue, ds.currentValue)
       .value(_.insertionTime, ds.insertionTime)
-      .ttl(10.minutes.inSeconds) // you can use TTL if you want to.
+      .ttl(100000.minutes.inSeconds) // you can use TTL if you want to.
       .future()
   }
 
