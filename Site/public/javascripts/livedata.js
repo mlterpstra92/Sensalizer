@@ -152,7 +152,8 @@ $(document ).ready(function() {
             var apiKey = $(this).parent().parent().find('td')[3].innerHTML.trim();
             console.log(apiKey);
             console.log(guid);
-            $.post({
+            $.ajax({
+                type: "POST",
                 url: "triggerFeed",
                 data: {feedid: feedID, apikey: apiKey, guid: guid}
             });

@@ -153,13 +153,13 @@ object Application extends Controller {
 
 
         //Fetch feed information from database and send it to the client
-        val labels = Await.result(models.Datastreams.getDatastreamIDs(feedIDStr.toInt), 2 seconds).distinct.toList
+        val labels = Await.result(models.Datastreams.getDatastreamIDs(feedIDStr.toInt), 10 seconds).distinct.toList
         val dataValues: util.ArrayList[List[Float]] = new util.ArrayList[List[Float]]
         labels.map(label => {
-          val List: List[Float] = Await.result(models.Datastreams.getDataValueByStreamID(feedIDStr.toInt, label), 1500 millis).toList
+          val List: List[Float] = Await.result(models.Datastreams.getDataValueByStreamID(feedIDStr.toInt, label), 10 seconds).toList
           dataValues.add(List)
         })
-        val timestamps = Await.result(models.Datastreams.getInsertionTimes(feedIDStr.toInt), 2 seconds).toList.distinct
+        val timestamps = Await.result(models.Datastreams.getInsertionTimes(feedIDStr.toInt), 10 seconds).toList.distinct
         println(createJsonFromDatastreams(feedIDStr.toInt, labels, dataValues, timestamps))
         channel.basicPublish("amq.topic", clientGUID, null, createJsonFromDatastreams(feedIDStr.toInt, labels, dataValues, timestamps).getBytes)
 
@@ -208,7 +208,7 @@ object Application extends Controller {
 
   //View a feed. Fetches all data from database and returns plain text
   def feed(feedID: Int) = Action {
-    val q = Await.result(models.Datastreams.getDatastreamIDs(feedID), 2 seconds)
+    val q = Await.result(models.Datastreams.getDatastreamIDs(feedID), 10 seconds)
     Ok("Feed " + feedID + ": \n" + q.mkString("\n"))
   }
 
