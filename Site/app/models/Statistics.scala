@@ -16,6 +16,7 @@ case class Statistics(feedID: Int) {
 object Statistics {
   val conf = new SparkConf(true).set("spark.cassandra.connection.host", "54.171.159.183")
   .set("cassandra.connection.host", "54.171.159.183")
+  .setSparkHome("/home/ubuntu/spark-1.1.0-bin-hadoop2.4")
   val sc = new SparkContext("local[2]", "sensalizer", conf)
   val ssc = new StreamingContext(sc, Duration.apply(2000))
   val cc = new CassandraSQLContext(sc)
