@@ -45,7 +45,7 @@ class ApplicationSpec extends Specification {
     }
 
     "render feed" in new WithApplication{
-      val profile = route(FakeRequest(GET, "/feeds/923879237")).get
+      val profile = route(FakeRequest(GET, "/feed/923879237")).get
 
       status(profile) must equalTo(OK)
       contentType(profile) must beSome.which(_ == "text/html")
