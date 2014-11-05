@@ -198,7 +198,6 @@ object Application extends Controller {
             label)
           models.Datastreams.insertNewRecord(ds)
         }
-        //Send to client
         channel.basicPublish("amq.topic", clientGUID, null, newJson.getBytes)
       }
     })
@@ -208,7 +207,7 @@ object Application extends Controller {
 
   //View a feed. Fetches all data from database and returns plain text
   def feed(feedID: Int) = Action {
-    val q = Await.result(models.Datastreams.getDatastreamIDs(feedID), 10 seconds)
+    val q = Await.result(models.Datastreams.getDatastreamIDs(feedID), 2 seconds).distinct
     Ok("Feed " + feedID + ": \n" + q.mkString("\n"))
   }
 
