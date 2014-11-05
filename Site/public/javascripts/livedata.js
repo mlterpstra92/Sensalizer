@@ -164,8 +164,8 @@ $(document ).ready(function() {
             var ws = new SockJS('http://' + RabbitMQIP + ':15674/stomp');
             var client = Stomp.over(ws);
             // SockJS does not support heart-beat: disable heart-beats
-            client.heartbeat.incoming = 0;
-            client.heartbeat.outgoing = 0;
+            client.heartbeat.incoming = 250;
+            client.heartbeat.outgoing = 250;
 
             var first = true;
             var chart = null;
