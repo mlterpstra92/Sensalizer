@@ -287,7 +287,7 @@ $(document ).ready(function() {
                         document.getElementById("aboveThreshold").innerText = a
                     }
                 });
-            }, 2000);
+            }, 10 * 1000); // 10 seconds in milliseconds
         }
     });
 });
